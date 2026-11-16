@@ -275,7 +275,30 @@ WHERE m.is_blocked AND t.fiscal_year = 2026</pre></div></div>
     <li><label><input type="checkbox" data-id="l4g4"> Add it to your agent: click <strong>Configure</strong>, then <strong>Data</strong>, then <strong>Add</strong>, and choose <code data-tpl>{{CATALOG}}.{{SANDBOX}}.pcard_metrics_{{NAME}}</code>.</label></li>
     <li><label><input type="checkbox" data-id="l4g5"> Compare Genie Code's glossary and measures with the answer key below. Which terms did it find? Did it put each one at the lowest layer that works?</label></li>
   </ol>
-  <h3>Step 3: fill the gaps from the answer key</h3>
+  <h3>Step 3: generate the instructions with Genie</h3>
+  <ol class="steps" data-group="lab4i">
+    <li><label><input type="checkbox" data-id="l4i1"> In your agent, click <strong>Configure</strong>, open the <strong>Instructions</strong> tab, and under <strong>General Instructions</strong> click <strong>Generate with Genie</strong>. Do this after steps 1 and 2, so Genie can refer to the snippets you accepted and your metric view.</label></li>
+    <li><label><input type="checkbox" data-id="l4i2"> Read what it wrote. Check it against the definitions below, and add any it missed. The one Genie can't know is that the data stops on June 30, 2026, so "last 90 days" and "as of today" need that date.</label></li>
+    <li><label><input type="checkbox" data-id="l4i3"> Save the instructions.</label></li>
+  </ol>
+  <details class="faq"><summary>See an example of what Genie generated in a dry run</summary><div class="codeblock"><pre>This agent supports P-Card (procurement card) program review for state government agencies, used by auditors and program managers to monitor spending, compliance, and risk.
+
+The fiscal year follows the North Carolina state schedule: July 1 through June 30. FY2026 runs from July 1, 2025 through June 30, 2026. Data covers FY2025 and FY2026. When the user says &quot;this year,&quot; &quot;current year,&quot; or &quot;this fiscal year&quot; without specifying, assume FY2026. Use the &quot;Current fiscal year default&quot; filter.
+
+All dollar amounts are in US dollars and are always positive. Round dollar outputs to two decimal places; round percentages to one decimal place.
+
+There are 12 state agencies (departments). Users may refer to them by full name (e.g. &quot;Department of Roads and Bridges&quot;) or by agency code (e.g. &quot;DRB&quot;). Always join to the agencies table to resolve names.
+
+Key audit areas:
+- Blocked merchant purchases: transactions at merchant categories that are not allowed. Use the &quot;places we don&#x27;t allow&quot; filter to identify them.
+- Split purchases: a cardholder breaks one purchase into multiple smaller transactions at the same merchant on the same day to stay under their single-purchase limit. Detected when the same card_id, merchant_name, and transaction_date have 2 or more transactions where each individual amount is within the cardholder&#x27;s single_purchase_limit but their combined total exceeds it.
+- Receipt compliance: the percentage of transactions with a receipt attached. Use the &quot;receipt rate percentage&quot; measure. Below 90% is considered poor; use the &quot;bad receipt compliance&quot; filter to find agencies that fall short.
+- Dormant cards: active cards with no recent transactions. Use the &quot;dormant cards&quot; filter.
+- Post-termination spending: transactions where the transaction_date is after the cardholder&#x27;s termination_date. This represents unauthorized use.
+- Late statement reconciliation: statements not reconciled within 30 days. Use the &quot;late statements&quot; filter.
+
+Budget comparisons: agency_budgets holds each agency&#x27;s annual P-Card budget allocation by fiscal year. Compare actual spending from transactions against the budget to calculate utilization. Use the &quot;Budget utilization by agency&quot; SQL example as a pattern.</pre></div></details>
+  <h3>Step 4: fill the gaps from the answer key</h3>
   <p>The fixes below are the answer key for this benchmark. Use them for anything the proposed fixes and Genie Code didn't cover, or apply them all if you're short on time.</p>
   <h4>Which fix repairs which question</h4>
   <table class="toolbox">
@@ -291,9 +314,9 @@ WHERE m.is_blocked AND t.fiscal_year = 2026</pre></div></div>
     </tbody>
   </table>
 
-  <h4>Fix 1: text instructions</h4>
+  <h4>Fix 1: definitions your instructions should cover</h4>
   <ol class="steps" data-group="lab4a">
-    <li><label><input type="checkbox" data-id="l4a"> In your agent, click <strong>Configure</strong>, open the <strong>Text</strong> tab, and paste:</label>
+    <li><label><input type="checkbox" data-id="l4a"> If Genie's generated instructions miss any of these, add them under <strong>Configure</strong>, <strong>Instructions</strong>, <strong>General Instructions</strong>:</label>
       <div class="codeblock"><pre>The data runs through June 30, 2026. Treat 2026-06-30 as today. &quot;This year&quot; means fiscal year 2026, and &quot;last quarter&quot; means fiscal year 2026 Q4 (April to June 2026).
 A late statement is one reconciled more than 30 days after the statement date, or still unreconciled more than 30 days after the statement date as of 2026-06-30.
 A dormant card is an Active card with no purchases from April 1 through June 30, 2026. Return a count unless the user asks for a list.
@@ -301,20 +324,28 @@ Bad receipt compliance means a receipt compliance rate below 90% for the fiscal 
 Big spenders are the top 10 cardholders by total spend in fiscal year 2026.
 &quot;Places we don&#x27;t allow&quot; means blocked merchant categories. Return a count and total dollars unless the user asks for a list.</pre></div></li>
   </ol>
-  <h4>Fix 2: example SQL queries</h4>
+  <h4>Fix 2: example SQL queries, with a parameter and usage guidance</h4>
+  <p>Usage guidance tells Genie when to use an example. A parameter lets one example answer many versions of a question, and a question that matches a parameterized example gets a verified answer.</p>
   <ol class="steps" data-group="lab4b">
-    <li><label><input type="checkbox" data-id="l4b"> In <strong>Configure</strong>, open the <strong>Examples</strong> tab and click <strong>Add</strong>. Add each question with its SQL:</label>
+    <li><label><input type="checkbox" data-id="l4b"> In <strong>Configure</strong>, open the <strong>Examples</strong> tab and click <strong>Add</strong>. Enter the question and the SQL:</label>
       <p class="q">How many statements were late?</p>
       <div class="codeblock"><pre data-tpl>SELECT COUNT(*) AS late_statements
 FROM `{{CATALOG}}`.`{{SCHEMA}}`.monthly_statements
 WHERE (reconciled AND days_to_reconcile &gt; 30)
-   OR (NOT reconciled AND DATEDIFF(DATE&#x27;2026-06-30&#x27;, statement_date) &gt; 30)</pre></div>
+   OR (NOT reconciled AND DATEDIFF(:as_of_date, statement_date) &gt; 30)</pre></div></li>
+    <li><label><input type="checkbox" data-id="l4b2"> Expand <strong>Parameters</strong> and set <code>as_of_date</code> to type <strong>Date</strong>, with this comment:</label>
+      <p class="q">The date to measure lateness from. The workshop data runs through 2026-06-30, so use that unless the user gives another date.</p></li>
+    <li><label><input type="checkbox" data-id="l4b3"> Expand <strong>Usage Guidance</strong> and paste:</label>
+      <p class="q">Use for questions about late, overdue or unreconciled statements. A statement is late if it was reconciled more than 30 days after the statement date, or is still unreconciled more than 30 days after it.</p></li>
+    <li><label><input type="checkbox" data-id="l4b4"> Click <strong>Preview</strong> to check it runs, then <strong>Save</strong>. Add the second example the same way:</label>
       <p class="q">Which cards are dormant?</p>
       <div class="codeblock"><pre data-tpl>SELECT COUNT(*) AS dormant_cards
 FROM `{{CATALOG}}`.`{{SCHEMA}}`.cardholders c
 WHERE c.card_status = &#x27;Active&#x27;
   AND NOT EXISTS (SELECT 1 FROM `{{CATALOG}}`.`{{SCHEMA}}`.transactions t
-                  WHERE t.card_id = c.card_id AND t.transaction_date &gt; DATE&#x27;2026-04-01&#x27;)</pre></div></li>
+                  WHERE t.card_id = c.card_id AND t.transaction_date &gt; DATE&#x27;2026-04-01&#x27;)</pre></div>
+      <p class="muted small">Usage guidance:</p>
+      <p class="q">Use for questions about dormant, inactive or unused cards. A dormant card is an Active card with no purchases from April 1 through June 30, 2026. Return a count unless the user asks for a list.</p></li>
   </ol>
   <h4>Fix 3: the answer key's metric view</h4>
   <p class="muted small">Use this if Genie Code's version wouldn't run or is missing measures. It has the same name, so running it replaces Genie Code's view, and your agent keeps using it.</p>
@@ -442,8 +473,8 @@ $$</pre></div></li>
       <li><strong>New agent:</strong> Genie Agents, New.</li>
       <li><strong>Benchmarks:</strong> Benchmark at the top of the agent, then the Questions tab and Run all benchmarks.</li>
       <li><strong>Results:</strong> Benchmark, then the Evaluations tab.</li>
-      <li><strong>Instructions:</strong> Configure, Text.</li>
-      <li><strong>Example queries and joins:</strong> Configure, Examples, Add.</li>
+      <li><strong>Instructions:</strong> Configure, Instructions, then Generate with Genie.</li>
+      <li><strong>Example queries:</strong> Configure, Examples, Add, then Parameters and Usage Guidance.</li>
       <li><strong>Add a metric view:</strong> Configure, Data, Add.</li>
       <li><strong>Agent-level descriptions and synonyms:</strong> Configure, Sources, pencil on a column.</li></ul></div>
     <div class="card"><h3>Habits</h3><ul>
