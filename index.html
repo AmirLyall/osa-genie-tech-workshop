@@ -169,7 +169,7 @@
       </ol>
     </div>
     <div class="tab-panel" id="load-manual">
-      <p>In your agent, click <strong>Benchmarks</strong>, then <strong>Add benchmark</strong>. Paste the question, paste its SQL as the answer, click <strong>Run</strong> to check it, then add it. Repeat for each question below.</p>
+      <p>In your agent, click <strong>Benchmark</strong> at the top of the page, then <strong>Add benchmark</strong>. Paste the question, paste its SQL as the answer, click <strong>Run</strong> to check it, then add it. Repeat for each question below.</p>
     </div>
   </div>
   <h3>The 10 benchmark questions</h3>
@@ -249,8 +249,8 @@ WHERE m.is_blocked AND t.fiscal_year = 2026</pre></div></div>
   <h2><span class="bullet b-yellow">3</span> Baseline benchmark</h2>
   <p class="goal"><strong>Goal:</strong> a baseline score, and a clear picture of why each failure happened. <span class="time">12:20 · 10 min</span></p>
   <ol class="steps" data-group="lab3">
-    <li><label><input type="checkbox" data-id="l3a"> In your agent, click <strong>Benchmarks</strong>, then <strong>Run benchmarks</strong>.</label></li>
-    <li><label><input type="checkbox" data-id="l3b"> When it finishes, open <strong>Monitor</strong>, then the <strong>Evaluations</strong> tab, and click the run. Note your accuracy score: that's your baseline.</label></li>
+    <li><label><input type="checkbox" data-id="l3a"> In your agent, click <strong>Benchmark</strong> at the top of the page (next to Chat and Monitor). Open the <strong>Questions</strong> tab and check that all 10 questions are there, then click <strong>Run all benchmarks</strong>.</label></li>
+    <li><label><input type="checkbox" data-id="l3b"> When it finishes, open the <strong>Evaluations</strong> tab on the same page and click the run. Note your <strong>Accuracy</strong>: that's your baseline.</label></li>
     <li><label><input type="checkbox" data-id="l3c"> Open each failed question and compare Genie's output with the ground truth. Was it the wrong definition, the wrong time period, a clarifying question, or just a different shape of answer?</label></li>
     <li><label><input type="checkbox" data-id="l3d"> Have Genie analyze the failures. Open <strong>Genie Code</strong> in your agent and paste:</label>
       <p class="q">These benchmark questions failed on my Genie Agent. For each one, explain why it failed and which fix would help most: a text instruction, an example SQL query, a metric view, or a column description or synonym. Prefer the most deterministic fix. Failed questions: [paste the failed questions here]</p></li>
@@ -383,8 +383,8 @@ $$</pre></div></li>
   <h2><span class="bullet b-purple">5</span> Re-run, compare, next steps</h2>
   <p class="goal"><strong>Goal:</strong> prove the fixes worked, see what Workbench adds, and leave with a production routine. <span class="time">12:45 · 15 min</span></p>
   <ol class="steps" data-group="lab5">
-    <li><label><input type="checkbox" data-id="l5a"> Click <strong>Benchmarks</strong>, then <strong>Run benchmarks</strong> again.</label></li>
-    <li><label><input type="checkbox" data-id="l5b"> In <strong>Monitor</strong>, <strong>Evaluations</strong>, compare the new run with your baseline. When we tried these same fixes, the agent went from about 3 to 9 or 10 correct out of 10.</label></li>
+    <li><label><input type="checkbox" data-id="l5a"> Click <strong>Benchmark</strong> at the top of the page, then <strong>Run all benchmarks</strong> again. Keep the same <strong>Mode</strong> as your baseline run, so the comparison is fair.</label></li>
+    <li><label><input type="checkbox" data-id="l5b"> In the <strong>Evaluations</strong> tab, compare the new run's accuracy with your baseline. When we tried these same fixes, the agent went from about 3 to 9 or 10 correct out of 10.</label></li>
     <li><label><input type="checkbox" data-id="l5c"> For any question still failing, decide: is the agent wrong, or is the benchmark too strict? Either is a legitimate fix.</label></li>
   </ol>
   <h3>Genie Workbench</h3>
@@ -425,8 +425,8 @@ $$</pre></div></li>
   <div class="cards two">
     <div class="card"><h3>Where things are</h3><ul>
       <li><strong>New agent:</strong> Genie Agents, New.</li>
-      <li><strong>Benchmarks:</strong> the Benchmarks tab, then Run benchmarks.</li>
-      <li><strong>Results:</strong> Monitor, then Evaluations.</li>
+      <li><strong>Benchmarks:</strong> Benchmark at the top of the agent, then the Questions tab and Run all benchmarks.</li>
+      <li><strong>Results:</strong> Benchmark, then the Evaluations tab.</li>
       <li><strong>Instructions:</strong> Configure, Text.</li>
       <li><strong>Example queries and joins:</strong> Configure, Examples, Add.</li>
       <li><strong>Add a metric view:</strong> Configure, Data, Add.</li>

@@ -133,4 +133,4 @@ if added:
     # Send the whole configuration back unchanged except for the new benchmarks.
     api.do("PATCH", f"/api/2.0/genie/spaces/{SPACE_ID}", body={"serialized_space": json.dumps(config)})
 print(f"Added {added} benchmark question(s). The agent now has {len(benchmarks)}.")
-print("Open your agent, click Benchmarks, and click Run benchmarks.")
+print("Open your agent, click Benchmark at the top, open the Questions tab, and click Run all benchmarks.")
