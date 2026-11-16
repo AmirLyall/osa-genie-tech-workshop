@@ -27,7 +27,7 @@
 <section id="welcome" class="hero"><div class="hero-inner">
   <p class="eyebrow">Tue, Nov 17, 2026 · 12:00 to 1:00 PM ET · NC Office of the State Auditor, Raleigh and virtual</p>
   <h1>Measure it. Fix it.<br>Measure again.</h1>
-  <p class="lead">A hands-on hour for OSA's technical team on making a Genie Agent reliable. You'll build an agent from the same P-card tables the auditors used last week,
+  <p class="lead">A hands-on hour for OSA's technical team on making a Genie Agent reliable. You'll build an agent from a set of P-card tables,
   score it with a set of <strong>deliberately poor questions</strong>, fix what fails at the right layer, and <strong>re-run the benchmark</strong> to prove the fixes worked.</p>
   <div class="cards three">
     <div class="card domain fin"><h3>Benchmarks</h3><p>Questions with known right answers, so "it seems better" becomes a score you can track after every change.</p></div>
@@ -37,9 +37,9 @@
   <div class="hero-ctas">
     <a class="btn" href="#start">Get ready (5 min)</a>
     <a class="btn ghost" href="#lab2">The benchmark questions</a>
-    <a class="btn ghost" href="https://amirlyall.github.io/osa-genie-workshop/" target="_blank" rel="noopener">Last week's business-user guide</a>
+    <a class="btn ghost" href="https://amirlyall.github.io/osa-genie-workshop/" target="_blank" rel="noopener">Business-user guide</a>
   </div>
-  <div class="callout info"><strong>All data is synthetic.</strong> The same fictional P-card dataset as last week: fictional agencies, people and merchants, following the NC fiscal year (July 1 to June 30). Nothing here is an OSA finding or an official statistic.</div>
+  <div class="callout info"><strong>All data is synthetic.</strong> A state purchasing card dataset with fictional agencies, people and merchants. It follows the NC fiscal year (July 1 to June 30) and runs through June 30, 2026. Nothing here is an OSA finding or an official statistic.</div>
 </div></section>
 
 <div class="layout">
@@ -82,7 +82,7 @@
 <section id="start">
   <h2>Get ready <span class="when">Before 12:00, about 5 minutes</span></h2>
   <ol class="steps" data-group="start">
-    <li><label><input type="checkbox" data-id="s1"> Sign in to the OSA Databricks workspace, click <strong>Catalog</strong>, and find the <code>osa_pcard_review</code> schema with its six tables. Your Databricks workspace administrators loaded it last week.</label></li>
+    <li><label><input type="checkbox" data-id="s1"> Sign in to the OSA Databricks workspace, click <strong>Catalog</strong>, and find the <code>osa_pcard_review</code> schema with its six tables. Your Databricks workspace administrators will tell you which catalog it's in.</label></li>
     <li><label><input type="checkbox" data-id="s2"> Check that you can see <strong>Genie Agents</strong> in the sidebar, and that you can create a view in a schema of your own, such as your ad-hoc schema. You'll create one metric view there.</label></li>
     <li><label><input type="checkbox" data-id="s3"> Fill in your settings below. Every SQL snippet on this page updates to match, so you can copy and paste without editing.</label></li>
   </ol>
@@ -100,8 +100,18 @@
 <section id="lab1" class="lab">
   <h2><span class="bullet b-red">1</span> Kickoff</h2>
   <p class="goal"><strong>Goal:</strong> agree on what "good" means and how we'll measure it. <span class="time">12:00 · 10 min</span></p>
-  <p>Last week the auditors each built an agent from these tables and saw where it stumbled. Their questions are your raw material: vague dates, terms that only make sense inside OSA, and definitions nobody wrote down.
-  Today you'll treat those failures the way you'd treat failing tests.</p>
+  <p>Users rarely ask the way a query is written. They use vague dates, shorthand only OSA would understand, and terms nobody has defined. Today's benchmark questions are written that way on purpose: worst practices.
+  A well-tuned agent should still get them right, and you'll treat each miss the way you'd treat a failing test.</p>
+  <table class="toolbox pair">
+    <thead><tr><th>Worst practice: how people ask</th><th>Best practice: what they mean</th></tr></thead>
+    <tbody>
+      <tr><td>Find fraud.</td><td>Transactions made after the cardholder's termination date in fiscal year 2026.</td></tr>
+      <tr><td>Who are our big spenders?</td><td>The top 10 cardholders by total spend in fiscal year 2026.</td></tr>
+      <tr><td>Which cards are dormant?</td><td>Active cards with no purchases from April 1 to June 30, 2026.</td></tr>
+      <tr><td>How much did we spend last quarter?</td><td>Total spend for fiscal year 2026 Q4, April to June 2026.</td></tr>
+    </tbody>
+  </table>
+  <p>Business users were coached on the right-hand column last week. Your job is the other half: make the agent cope with the left-hand column, because that's how most people will ask.</p>
   <div class="layers" role="figure" aria-label="Layers of business logic in a Genie Agent, from least to most reliable">
     <p class="headline">Lower layers are more deterministic. Every piece of business logic should live as far down as possible.</p>
     <div class="grid">
@@ -386,7 +396,7 @@ $$</pre></div></li>
     <label><input type="checkbox" data-id="p2"> Keep 20 to 50 benchmark questions per agent, drawn from what users really ask, including more than one phrasing of each.</label>
     <label><input type="checkbox" data-id="p3"> Re-run benchmarks after every change to instructions, examples or data, and before sharing more widely.</label>
     <label><input type="checkbox" data-id="p4"> Review <strong>Monitor</strong> weekly. Every Fix it or Request review is a candidate benchmark question.</label>
-    <label><input type="checkbox" data-id="p5"> Turn the auditors' question templates from last week into benchmark questions.</label>
+    <label><input type="checkbox" data-id="p5"> Collect real questions from business users, and turn the ones Genie gets wrong into benchmark questions.</label>
     <label><input type="checkbox" data-id="p6"> Move definitions that more than one agent needs into a shared metric view, instead of repeating them in instructions.</label>
   </div>
 </section>
