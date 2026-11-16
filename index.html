@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=2">
+<link rel="stylesheet" href="styles.css?v=3">
 </head>
 <body>
 
@@ -87,8 +87,9 @@
     <li><label><input type="checkbox" data-id="s3"> Fill in your settings below. Every SQL snippet on this page updates to match, so you can copy and paste without editing.</label></li>
   </ol>
   <div class="settings-box">
-    <div class="grid3">
+    <div class="grid3 grid2x2">
       <div><label for="set-catalog">Catalog of the workshop tables</label><input id="set-catalog" data-setting="CATALOG" placeholder="for example osa_main" spellcheck="false"></div>
+      <div><label for="set-schema">Schema of the workshop tables</label><input id="set-schema" data-setting="SCHEMA" placeholder="osa_pcard_review" spellcheck="false"></div>
       <div><label for="set-sandbox">Your schema for the metric view</label><input id="set-sandbox" data-setting="SANDBOX" placeholder="for example adhoc_jsmith" spellcheck="false"></div>
       <div><label for="set-name">Your short name</label><input id="set-name" data-setting="NAME" placeholder="for example jsmith" spellcheck="false"></div>
     </div>
@@ -161,11 +162,9 @@
     <div class="tab-panel active" id="load-nb">
       <ol class="steps" data-group="lab2nb">
         <li><label><input type="checkbox" data-id="l2e"> Download <a href="load_benchmarks.py" download><code>load_benchmarks.py</code></a> and import it into your workspace folder (<strong>Workspace</strong>, then <strong>Import</strong>).</label></li>
-        <li><label><input type="checkbox" data-id="l2f"> Fill in the boxes at the top of the notebook, copying from below. Type into the boxes rather than editing the code. Leave <strong>Schema</strong> as <code>osa_pcard_review</code>.</label>
-          <p class="q"><span data-tpl>{{AGENT}}</span></p>
-          <p class="muted small">That goes in <strong>Agent URL or ID</strong>. This goes in <strong>Catalog</strong>:</p>
-          <p class="q"><span data-tpl>{{CATALOG}}</span></p></li>
-        <li><label><input type="checkbox" data-id="l2g"> Connect to <strong>Serverless</strong> and click <strong>Run all</strong>. It prints "Added 10 benchmark question(s)". Re-running is safe and never creates duplicates.</label></li>
+        <li><label><input type="checkbox" data-id="l2f"> Paste your agent's URL into the <strong>Agent URL or ID</strong> box at the top of the notebook. Type into the box rather than editing the code. The notebook works out which catalog and schema your agent's tables are in.</label>
+          <p class="q"><span data-tpl>{{AGENT}}</span></p></li>
+        <li><label><input type="checkbox" data-id="l2g"> Connect to <strong>Serverless</strong> and click <strong>Run all</strong>. It prints the tables it found and "Added 10 ... benchmark question(s)". Re-running is safe: it never creates duplicates, and it updates the reference answers if your tables moved.</label></li>
       </ol>
     </div>
     <div class="tab-panel" id="load-manual">
@@ -177,13 +176,13 @@
   <div class="bench-item"><h4>Question 1</h4>
     <p class="q">How much did we spend last quarter?</p>
     <div class="codeblock"><pre data-tpl>SELECT ROUND(SUM(amount), 2) AS total_spend
-FROM `{{CATALOG}}`.`osa_pcard_review`.transactions
+FROM `{{CATALOG}}`.`{{SCHEMA}}`.transactions
 WHERE fiscal_year = 2026 AND fiscal_quarter = &#x27;Q4&#x27;</pre></div></div>
   <div class="bench-item"><h4>Question 2</h4>
     <p class="q">Which agencies have bad receipt compliance?</p>
     <div class="codeblock"><pre data-tpl>SELECT a.agency_code, a.agency_name,
        ROUND(100 * AVG(CASE WHEN t.receipt_attached THEN 1 ELSE 0 END), 1) AS receipt_compliance_pct
-FROM `{{CATALOG}}`.`osa_pcard_review`.transactions t JOIN `{{CATALOG}}`.`osa_pcard_review`.agencies a ON t.agency_code = a.agency_code
+FROM `{{CATALOG}}`.`{{SCHEMA}}`.transactions t JOIN `{{CATALOG}}`.`{{SCHEMA}}`.agencies a ON t.agency_code = a.agency_code
 WHERE t.fiscal_year = 2026
 GROUP BY a.agency_code, a.agency_name
 HAVING ROUND(100 * AVG(CASE WHEN t.receipt_attached THEN 1 ELSE 0 END), 1) &lt; 90
@@ -191,19 +190,19 @@ ORDER BY receipt_compliance_pct ASC</pre></div></div>
   <div class="bench-item"><h4>Question 3</h4>
     <p class="q">What&#x27;s our receipt rate?</p>
     <div class="codeblock"><pre data-tpl>SELECT ROUND(100 * AVG(CASE WHEN receipt_attached THEN 1 ELSE 0 END), 1) AS receipt_compliance_pct
-FROM `{{CATALOG}}`.`osa_pcard_review`.transactions
+FROM `{{CATALOG}}`.`{{SCHEMA}}`.transactions
 WHERE fiscal_year = 2026</pre></div></div>
   <div class="bench-item"><h4>Question 4</h4>
     <p class="q">How many statements were late?</p>
     <div class="codeblock"><pre data-tpl>SELECT COUNT(*) AS late_statements
-FROM `{{CATALOG}}`.`osa_pcard_review`.monthly_statements
+FROM `{{CATALOG}}`.`{{SCHEMA}}`.monthly_statements
 WHERE (reconciled AND days_to_reconcile &gt; 30)
    OR (NOT reconciled AND DATEDIFF(DATE&#x27;2026-06-30&#x27;, statement_date) &gt; 30)</pre></div></div>
   <div class="bench-item"><h4>Question 5</h4>
     <p class="q">How many split purchases were there?</p>
     <div class="codeblock"><pre data-tpl>SELECT COUNT(*) AS split_purchase_groups FROM (
   SELECT t.card_id
-  FROM `{{CATALOG}}`.`osa_pcard_review`.transactions t JOIN `{{CATALOG}}`.`osa_pcard_review`.cardholders c ON t.card_id = c.card_id
+  FROM `{{CATALOG}}`.`{{SCHEMA}}`.transactions t JOIN `{{CATALOG}}`.`{{SCHEMA}}`.cardholders c ON t.card_id = c.card_id
   GROUP BY t.card_id, t.merchant_name, t.transaction_date, c.single_purchase_limit
   HAVING COUNT(*) &gt;= 2 AND MAX(t.amount) &lt;= c.single_purchase_limit AND SUM(t.amount) &gt; c.single_purchase_limit
 )</pre></div></div>
@@ -211,28 +210,28 @@ WHERE (reconciled AND days_to_reconcile &gt; 30)
     <p class="q">Who kept spending after they left?</p>
     <div class="codeblock"><pre data-tpl>SELECT c.card_id, c.cardholder_name, c.agency_code, c.termination_date,
        COUNT(*) AS purchases_after_termination, ROUND(SUM(t.amount), 2) AS total_after_termination
-FROM `{{CATALOG}}`.`osa_pcard_review`.transactions t JOIN `{{CATALOG}}`.`osa_pcard_review`.cardholders c ON t.card_id = c.card_id
+FROM `{{CATALOG}}`.`{{SCHEMA}}`.transactions t JOIN `{{CATALOG}}`.`{{SCHEMA}}`.cardholders c ON t.card_id = c.card_id
 WHERE c.termination_date IS NOT NULL AND t.transaction_date &gt; c.termination_date
 GROUP BY c.card_id, c.cardholder_name, c.agency_code, c.termination_date
 ORDER BY total_after_termination DESC</pre></div></div>
   <div class="bench-item"><h4>Question 7</h4>
     <p class="q">Total spend by department FY26</p>
     <div class="codeblock"><pre data-tpl>SELECT a.agency_name, ROUND(SUM(t.amount), 2) AS total_spend
-FROM `{{CATALOG}}`.`osa_pcard_review`.transactions t JOIN `{{CATALOG}}`.`osa_pcard_review`.agencies a ON t.agency_code = a.agency_code
+FROM `{{CATALOG}}`.`{{SCHEMA}}`.transactions t JOIN `{{CATALOG}}`.`{{SCHEMA}}`.agencies a ON t.agency_code = a.agency_code
 WHERE t.fiscal_year = 2026
 GROUP BY a.agency_name
 ORDER BY total_spend DESC</pre></div></div>
   <div class="bench-item"><h4>Question 8</h4>
     <p class="q">Which cards are dormant?</p>
     <div class="codeblock"><pre data-tpl>SELECT COUNT(*) AS dormant_cards
-FROM `{{CATALOG}}`.`osa_pcard_review`.cardholders c
+FROM `{{CATALOG}}`.`{{SCHEMA}}`.cardholders c
 WHERE c.card_status = &#x27;Active&#x27;
-  AND NOT EXISTS (SELECT 1 FROM `{{CATALOG}}`.`osa_pcard_review`.transactions t
+  AND NOT EXISTS (SELECT 1 FROM `{{CATALOG}}`.`{{SCHEMA}}`.transactions t
                   WHERE t.card_id = c.card_id AND t.transaction_date &gt; DATE&#x27;2026-04-01&#x27;)</pre></div></div>
   <div class="bench-item"><h4>Question 9</h4>
     <p class="q">Who are our big spenders?</p>
     <div class="codeblock"><pre data-tpl>SELECT c.card_id, c.cardholder_name, c.agency_code, ROUND(SUM(t.amount), 2) AS fy2026_spend
-FROM `{{CATALOG}}`.`osa_pcard_review`.transactions t JOIN `{{CATALOG}}`.`osa_pcard_review`.cardholders c ON t.card_id = c.card_id
+FROM `{{CATALOG}}`.`{{SCHEMA}}`.transactions t JOIN `{{CATALOG}}`.`{{SCHEMA}}`.cardholders c ON t.card_id = c.card_id
 WHERE t.fiscal_year = 2026
 GROUP BY c.card_id, c.cardholder_name, c.agency_code
 ORDER BY fy2026_spend DESC
@@ -240,7 +239,7 @@ LIMIT 10</pre></div></div>
   <div class="bench-item"><h4>Question 10</h4>
     <p class="q">Purchases at places we don&#x27;t allow this year</p>
     <div class="codeblock"><pre data-tpl>SELECT COUNT(*) AS blocked_purchases, ROUND(SUM(t.amount), 2) AS blocked_dollars
-FROM `{{CATALOG}}`.`osa_pcard_review`.transactions t JOIN `{{CATALOG}}`.`osa_pcard_review`.merchant_categories m ON t.mcc = m.mcc
+FROM `{{CATALOG}}`.`{{SCHEMA}}`.transactions t JOIN `{{CATALOG}}`.`{{SCHEMA}}`.merchant_categories m ON t.mcc = m.mcc
 WHERE m.is_blocked AND t.fiscal_year = 2026</pre></div></div>
 </section>
 
@@ -251,9 +250,8 @@ WHERE m.is_blocked AND t.fiscal_year = 2026</pre></div></div>
   <ol class="steps" data-group="lab3">
     <li><label><input type="checkbox" data-id="l3a"> In your agent, click <strong>Benchmark</strong> at the top of the page (next to Chat and Monitor). Open the <strong>Questions</strong> tab and check that all 10 questions are there, then click <strong>Run all benchmarks</strong>.</label></li>
     <li><label><input type="checkbox" data-id="l3b"> When it finishes, open the <strong>Evaluations</strong> tab on the same page and click the run. Note your <strong>Accuracy</strong>: that's your baseline.</label></li>
-    <li><label><input type="checkbox" data-id="l3c"> Open each failed question and compare Genie's output with the ground truth. Was it the wrong definition, the wrong time period, a clarifying question, or just a different shape of answer?</label></li>
-    <li><label><input type="checkbox" data-id="l3d"> Have Genie analyze the failures. Open <strong>Genie Code</strong> in your agent and paste:</label>
-      <p class="q">These benchmark questions failed on my Genie Agent. For each one, explain why it failed and which fix would help most: a text instruction, an example SQL query, a metric view, or a column description or synonym. Prefer the most deterministic fix. Failed questions: [paste the failed questions here]</p></li>
+    <li><label><input type="checkbox" data-id="l3c"> Click two or three of the failed questions. Each one shows a <strong>Score reason</strong>, such as Extra Rows or Aggregation Issue, and a <strong>Judge analysis</strong> that explains how Genie's query differs from the reference. Turn on <strong>Show diff view</strong> to compare the SQL side by side.</label></li>
+    <li><label><input type="checkbox" data-id="l3d"> For each failure, decide what kind of miss it is: a missing definition, the wrong time period, a clarifying question, or the right numbers in a different shape. That tells you which layer will fix it.</label></li>
   </ol>
   <div class="callout tip"><strong>Expect a low score.</strong> When we asked a bare agent these 10 questions, it got about 3 right. The column descriptions in Unity Catalog carried it on split purchases and terminated cardholders. On "dormant" it asked for clarification, and on "big spenders" it returned nothing.</div>
   <div class="callout info"><strong>Not every miss is wrong.</strong> Sometimes Genie returns the right numbers with extra columns. Treat those as formatting, not logic, and decide whether the benchmark or the agent should change.</div>
@@ -263,7 +261,20 @@ WHERE m.is_blocked AND t.fiscal_year = 2026</pre></div></div>
 <section id="lab4" class="lab">
   <h2><span class="bullet b-green">4</span> Improve the agent</h2>
   <p class="goal"><strong>Goal:</strong> fix the failures, choosing the lowest layer that works for each. <span class="time">12:30 · 15 min</span></p>
-  <h3>Which fix repairs which question</h3>
+  <h3>Step 1: review Genie's proposed fixes</h3>
+  <ol class="steps" data-group="lab4r">
+    <li><label><input type="checkbox" data-id="l4r1"> In your evaluation run, click <strong>Review proposed fixes</strong>. Genie turns the failures into knowledge snippets, such as a definition of "places we don't allow" or the join between purchases and merchant categories.</label></li>
+    <li><label><input type="checkbox" data-id="l4r2"> Read each snippet before accepting it. Does it match OSA's definition? For example, is the suggested "late statements" filter the same as card policy? Accept the ones that are right, reject the rest, and click <strong>Accept</strong>.</label></li>
+  </ol>
+  <h3>Step 2: ask Genie Code for the bigger picture</h3>
+  <ol class="steps" data-group="lab4g">
+    <li><label><input type="checkbox" data-id="l4g1"> Open <strong>Genie Code</strong> in your agent and paste:</label>
+      <p class="q">Review this agent's tables, column descriptions and benchmark results. Suggest the business terms that need a glossary definition, the metrics that should live in a metric view instead of text instructions, and any joins that should be defined. Then draft the metric view YAML.</p></li>
+    <li><label><input type="checkbox" data-id="l4g2"> Compare its suggestions with the answer key below. Which terms did it find? Did it put each one at the lowest layer that works?</label></li>
+  </ol>
+  <h3>Step 3: fill the gaps from the answer key</h3>
+  <p>The fixes below are the answer key for this benchmark. Use them for anything the proposed fixes and Genie Code didn't cover, or apply them all if you're short on time.</p>
+  <h4>Which fix repairs which question</h4>
   <table class="toolbox">
     <thead><tr><th>Benchmark question</th><th>Why a bare agent misses it</th><th>Fix</th></tr></thead>
     <tbody>
@@ -277,7 +288,7 @@ WHERE m.is_blocked AND t.fiscal_year = 2026</pre></div></div>
     </tbody>
   </table>
 
-  <h3>Fix 1: text instructions</h3>
+  <h4>Fix 1: text instructions</h4>
   <ol class="steps" data-group="lab4a">
     <li><label><input type="checkbox" data-id="l4a"> In your agent, click <strong>Configure</strong>, open the <strong>Text</strong> tab, and paste:</label>
       <div class="codeblock"><pre>The data runs through June 30, 2026. Treat 2026-06-30 as today. &quot;This year&quot; means fiscal year 2026, and &quot;last quarter&quot; means fiscal year 2026 Q4 (April to June 2026).
@@ -287,22 +298,22 @@ Bad receipt compliance means a receipt compliance rate below 90% for the fiscal 
 Big spenders are the top 10 cardholders by total spend in fiscal year 2026.
 &quot;Places we don&#x27;t allow&quot; means blocked merchant categories. Return a count and total dollars unless the user asks for a list.</pre></div></li>
   </ol>
-  <h3>Fix 2: example SQL queries</h3>
+  <h4>Fix 2: example SQL queries</h4>
   <ol class="steps" data-group="lab4b">
     <li><label><input type="checkbox" data-id="l4b"> In <strong>Configure</strong>, open the <strong>Examples</strong> tab and click <strong>Add</strong>. Add each question with its SQL:</label>
       <p class="q">How many statements were late?</p>
       <div class="codeblock"><pre data-tpl>SELECT COUNT(*) AS late_statements
-FROM `{{CATALOG}}`.`osa_pcard_review`.monthly_statements
+FROM `{{CATALOG}}`.`{{SCHEMA}}`.monthly_statements
 WHERE (reconciled AND days_to_reconcile &gt; 30)
    OR (NOT reconciled AND DATEDIFF(DATE&#x27;2026-06-30&#x27;, statement_date) &gt; 30)</pre></div>
       <p class="q">Which cards are dormant?</p>
       <div class="codeblock"><pre data-tpl>SELECT COUNT(*) AS dormant_cards
-FROM `{{CATALOG}}`.`osa_pcard_review`.cardholders c
+FROM `{{CATALOG}}`.`{{SCHEMA}}`.cardholders c
 WHERE c.card_status = &#x27;Active&#x27;
-  AND NOT EXISTS (SELECT 1 FROM `{{CATALOG}}`.`osa_pcard_review`.transactions t
+  AND NOT EXISTS (SELECT 1 FROM `{{CATALOG}}`.`{{SCHEMA}}`.transactions t
                   WHERE t.card_id = c.card_id AND t.transaction_date &gt; DATE&#x27;2026-04-01&#x27;)</pre></div></li>
   </ol>
-  <h3>Fix 3: a metric view of your own</h3>
+  <h4>Fix 3: a metric view of your own</h4>
   <ol class="steps" data-group="lab4c">
     <li><label><input type="checkbox" data-id="l4c"> Open the <strong>SQL editor</strong> and run this. It creates your metric view in your own schema, over the shared tables, with official definitions and synonyms:</label>
       <div class="codeblock"><pre data-tpl>CREATE OR REPLACE VIEW `{{CATALOG}}`.`{{SANDBOX}}`.pcard_metrics_{{NAME}}
@@ -310,17 +321,17 @@ WITH METRICS
 LANGUAGE YAML
 AS $$
   version: 1.1
-  source: {{CATALOG}}.osa_pcard_review.transactions
+  source: {{CATALOG}}.`{{SCHEMA}}`.transactions
   comment: &quot;Official P-card metrics for OSA reviews. Data runs through June 30, 2026. Fiscal years run July 1 to June 30.&quot;
   joins:
     - name: agency
-      source: {{CATALOG}}.osa_pcard_review.agencies
+      source: {{CATALOG}}.`{{SCHEMA}}`.agencies
       on: source.agency_code = agency.agency_code
     - name: cardholder
-      source: {{CATALOG}}.osa_pcard_review.cardholders
+      source: {{CATALOG}}.`{{SCHEMA}}`.cardholders
       on: source.card_id = cardholder.card_id
     - name: category
-      source: {{CATALOG}}.osa_pcard_review.merchant_categories
+      source: {{CATALOG}}.`{{SCHEMA}}`.merchant_categories
       on: source.mcc = category.mcc
   dimensions:
     - name: Agency
@@ -363,7 +374,7 @@ AS $$
 $$</pre></div></li>
     <li><label><input type="checkbox" data-id="l4d"> Back in your agent, click <strong>Configure</strong>, then <strong>Data</strong>, then <strong>Add</strong>, and add <code data-tpl>{{CATALOG}}.{{SANDBOX}}.pcard_metrics_{{NAME}}</code>.</label></li>
   </ol>
-  <h3>Fix 4: a synonym inside the agent</h3>
+  <h4>Fix 4: a synonym inside the agent</h4>
   <ol class="steps" data-group="lab4d">
     <li><label><input type="checkbox" data-id="l4e"> In <strong>Configure</strong>, open <strong>Sources</strong>, click the <code>agencies</code> table, and click the <strong>pencil icon</strong> on <code>agency_name</code>. Add these synonyms and save:</label>
       <p class="q">department, dept, state agency</p></li>
@@ -372,7 +383,7 @@ $$</pre></div></li>
   <h3>Worth knowing</h3>
   <div class="cards two">
     <div class="card"><h3>Joins</h3><p>Under <strong>Configure</strong>, <strong>Examples</strong>, <strong>Add</strong>, <strong>Joins</strong>, you can define how tables connect and the relationship type. Genie already joins these tables correctly, because the key columns share names across tables, so you don't need it today.</p></div>
-    <div class="card"><h3>Genie Code suggestions</h3><p>Now accept the suggestions you held back in section 2, and note which ones you'd keep in production. Re-running the benchmark tells you whether they helped.</p></div>
+    <div class="card"><h3>Genie Code suggestions</h3><p>The suggestions you held back in section 2 are still available. Accept the ones you'd keep in production, and the re-run will tell you whether they helped.</p></div>
     <div class="card"><h3>Genie ontology</h3><p>The shared context layer behind Genie. It combines modeled knowledge, such as metric views and domains, with knowledge Genie learns over time, and treats curated agents as authoritative. Your metric view is part of that modeled knowledge.</p></div>
     <div class="card"><h3>Trusted answers</h3><p>When a user's question matches a parameterized example query, Genie runs that query and marks the answer as verified. It's the strongest signal you can give for questions that must always be answered the same way.</p></div>
   </div>
@@ -455,6 +466,6 @@ $$</pre></div></li>
 </main>
 </div>
 
-<script src="app.js?v=3"></script>
+<script src="app.js?v=4"></script>
 </body>
 </html>

@@ -8,9 +8,9 @@
   const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
 
   /* ---------- your settings: fill {{CATALOG}}, {{SANDBOX}}, {{NAME}} and {{AGENT}} in every snippet ---------- */
-  const FIELDS = { CATALOG: "<catalog>", SANDBOX: "<your_schema>", NAME: "<yourname>", AGENT: "<your agent URL: paste it in step 4 above>" };
+  const FIELDS = { CATALOG: "<catalog>", SCHEMA: "osa_pcard_review", SANDBOX: "<your_schema>", NAME: "<yourname>", AGENT: "<your agent URL: paste it in step 4 above>" };
   const settings = store.get("settings", {});
-  const fill = (text) => text.replace(/\{\{(CATALOG|SANDBOX|NAME|AGENT)\}\}/g, (m, k) => (settings[k] || "").trim() || FIELDS[k]);
+  const fill = (text) => text.replace(/\{\{(CATALOG|SCHEMA|SANDBOX|NAME|AGENT)\}\}/g, (m, k) => (settings[k] || "").trim() || FIELDS[k]);
   $$("[data-tpl]").forEach((el) => { el.dataset.template = el.textContent; });
   function render() { $$("[data-tpl]").forEach((el) => { el.textContent = fill(el.dataset.template); }); }
   $$(".settings-box input[data-setting]").forEach((input) => {

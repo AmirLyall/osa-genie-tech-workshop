@@ -4,37 +4,49 @@
 # MAGIC
 # MAGIC Adds the workshop's 10 poorly worded benchmark questions, each with a reference SQL answer, to **your own** Genie Agent.
 # MAGIC
-# MAGIC **How to run:** fill in the boxes at the top of the notebook: your agent's URL in **Agent URL or ID** and the catalog of the workshop tables in **Catalog**. Leave **Schema** as `osa_pcard_review` unless your tables are elsewhere, then **Run all**.
-# MAGIC It takes a few seconds. Re-running is safe: questions already in the agent are skipped, and nothing else in the agent changes.
+# MAGIC **How to run:** paste your agent's URL into the **Agent URL or ID** box at the top of the notebook, then **Run all**. It takes a few seconds.
+# MAGIC The notebook reads which catalog and schema your agent's tables are in, and points every reference answer at those same tables.
 # MAGIC
+# MAGIC Re-running is safe. Workshop questions already in the agent are updated to match your tables, and nothing else in the agent changes.
 # MAGIC You need **Can Manage** or **Can Edit** on the agent. You get Can Manage automatically on agents you create.
 
 # COMMAND ----------
 
-# Fill in the boxes at the top of the notebook, or paste your values between the quotes here.
-# A value in a box wins; these are used when a box is empty.
-DEFAULT_AGENT = ""    # your agent's URL or ID
-DEFAULT_CATALOG = ""  # catalog that holds the workshop tables
+# Paste your agent's URL in the box at the top of the notebook, or between the quotes here.
+# A value in the box wins; this is used when the box is empty.
+DEFAULT_AGENT = ""  # your agent's URL or ID
 
 # Argument order is name, default value, label.
 dbutils.widgets.text("agent", DEFAULT_AGENT, "Agent URL or ID")
-dbutils.widgets.text("catalog", DEFAULT_CATALOG, "Catalog")
-dbutils.widgets.text("schema", "osa_pcard_review", "Schema")
 
 import re
-# Fall back to the defaults, because a box that already exists keeps its old value when the cell is edited and re-run.
+# Fall back to the default, because a box that already exists keeps its old value when the cell is edited and re-run.
 AGENT = dbutils.widgets.get("agent").strip() or DEFAULT_AGENT.strip()
-CATALOG = dbutils.widgets.get("catalog").strip() or DEFAULT_CATALOG.strip()
-SCHEMA = dbutils.widgets.get("schema").strip() or "osa_pcard_review"
-if not AGENT or not CATALOG:
-    raise ValueError("Fill in the 'Agent URL or ID' and 'Catalog' boxes at the top of the notebook (or DEFAULT_AGENT and DEFAULT_CATALOG in this cell), then Run all again.")
+if not AGENT:
+    raise ValueError("Paste your agent's URL into the 'Agent URL or ID' box at the top of the notebook (or DEFAULT_AGENT in this cell), then Run all again.")
 # Accept a full URL such as .../genie/rooms/<id>?o=123 or just the ID.
 match = re.search(r"([0-9a-f]{32})", AGENT)
 if not match:
-    raise ValueError("Couldn't find an agent ID in the 'agent' widget. Paste the agent's URL from your browser.")
+    raise ValueError("Couldn't find an agent ID. Paste the agent's URL from your browser address bar.")
 SPACE_ID = match.group(1)
+
+# COMMAND ----------
+
+import json, uuid
+from databricks.sdk import WorkspaceClient
+
+api = WorkspaceClient().api_client
+space = api.do("GET", f"/api/2.0/genie/spaces/{SPACE_ID}", query={"include_serialized_space": "true"})
+config = json.loads(space["serialized_space"])
+
+# Find the workshop tables in the agent, so the reference answers query the same tables the agent uses.
+tables = [t["identifier"] for t in config.get("data_sources", {}).get("tables", [])]
+found = [t.rsplit(".", 1)[0] for t in tables if t.rsplit(".", 1)[-1].strip("`") == "transactions"]
+if not found:
+    raise ValueError("This agent has no 'transactions' table. Add the six workshop tables to the agent first, then Run all again.")
+CATALOG, SCHEMA = [p.strip("`") for p in found[0].split(".", 1)]
 S = f"`{CATALOG}`.`{SCHEMA}`"
-print(f"Agent  : {SPACE_ID}\nTables : {CATALOG}.{SCHEMA}")
+print(f"Agent  : {space.get('title')} ({SPACE_ID})\nTables : {CATALOG}.{SCHEMA}")
 
 # COMMAND ----------
 
@@ -101,36 +113,33 @@ WHERE m.is_blocked AND t.fiscal_year = 2026"""),
 
 # COMMAND ----------
 
-import json, uuid
-from databricks.sdk import WorkspaceClient
-
-api = WorkspaceClient().api_client
-
 def lines(text):  # the Genie API stores long text as a list of newline-terminated lines
     parts = text.strip("\n").split("\n")
     return [p + "\n" for p in parts[:-1]] + [parts[-1]]
 
-space = api.do("GET", f"/api/2.0/genie/spaces/{SPACE_ID}", query={"include_serialized_space": "true"})
-config = json.loads(space["serialized_space"])
-print(f"Agent  : {space.get('title')}")
-
 benchmarks = config.setdefault("benchmarks", {}).setdefault("questions", [])
-existing = {"".join(b.get("question", [])).strip().lower() for b in benchmarks}
-added = 0
+by_question = {"".join(b.get("question", [])).strip().lower(): b for b in benchmarks}
+added = updated = 0
 for question, sql in BENCHMARKS:
-    if question.lower() in existing:
+    answer = [{"format": "SQL", "content": lines(sql)}]
+    current = by_question.get(question.lower())
+    if current:
+        # Already loaded: refresh the reference answer so it points at this agent's tables.
+        if current.get("answer") != answer:
+            current["answer"] = answer
+            updated += 1
         continue
     benchmarks.append({
         # stable ID per agent and question, so re-runs never create duplicates
         "id": uuid.uuid5(uuid.NAMESPACE_URL, f"osa-genie-tech/{SPACE_ID}/{question}").hex,
         "question": [question],
-        "answer": [{"format": "SQL", "content": lines(sql)}],
+        "answer": answer,
     })
     added += 1
 benchmarks.sort(key=lambda b: b["id"])
 
-if added:
-    # Send the whole configuration back unchanged except for the new benchmarks.
+if added or updated:
+    # Send the whole configuration back unchanged except for the workshop benchmarks.
     api.do("PATCH", f"/api/2.0/genie/spaces/{SPACE_ID}", body={"serialized_space": json.dumps(config)})
-print(f"Added {added} benchmark question(s). The agent now has {len(benchmarks)}.")
+print(f"Added {added} and updated {updated} benchmark question(s). The agent now has {len(benchmarks)}.")
 print("Open your agent, click Benchmark at the top, open the Questions tab, and click Run all benchmarks.")
