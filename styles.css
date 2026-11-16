@@ -346,3 +346,6 @@ h3 .pill { font-size: 11px; font-weight: 600; color: var(--slate); background: v
 .bench-item { background: var(--white); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 14px; margin: 10px 0; }
 .bench-item h4 { margin: 2px 0 6px; font-size: .95em; }
 @media (max-width: 760px) { .settings-box .grid3 { grid-template-columns: 1fr; } }
+.steps .settings-box { margin: 10px 0 2px; }
+.steps .settings-box input { position: static; display: block; width: 100%; height: auto; margin: 0; appearance: auto; -webkit-appearance: none; font: inherit; font-size: .93em; padding: 8px 10px; border: 1px solid var(--line); border-radius: 4px; background: var(--white); }
+.steps .settings-box label { position: static; padding: 0; }

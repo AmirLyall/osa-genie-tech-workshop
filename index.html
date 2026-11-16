@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=1">
+<link rel="stylesheet" href="styles.css?v=2">
 </head>
 <body>
 
@@ -28,7 +28,7 @@
   <p class="eyebrow">Tue, Nov 17, 2026 · 12:00 to 1:00 PM ET · NC Office of the State Auditor, Raleigh and virtual</p>
   <h1>Measure it. Fix it.<br>Measure again.</h1>
   <p class="lead">A hands-on hour for OSA's technical team on making a Genie Agent reliable. You'll build an agent from a set of P-card tables,
-  score it with a set of <strong>deliberately poor questions</strong>, fix what fails at the right layer, and <strong>re-run the benchmark</strong> to prove the fixes worked.</p>
+  score it with a set of <strong>worst-practice questions</strong> written the way people really ask, fix what fails at the right layer, and <strong>re-run the benchmark</strong> to prove the fixes worked.</p>
   <div class="cards three">
     <div class="card domain fin"><h3>Benchmarks</h3><p>Questions with known right answers, so "it seems better" becomes a score you can track after every change.</p></div>
     <div class="card domain perf"><h3>Improvement layers</h3><p>Instructions, example queries, metric views and agent-level metadata. Each fixes a different kind of failure.</p></div>
@@ -92,7 +92,6 @@
       <div><label for="set-sandbox">Your schema for the metric view</label><input id="set-sandbox" data-setting="SANDBOX" placeholder="for example adhoc_jsmith" spellcheck="false"></div>
       <div><label for="set-name">Your short name</label><input id="set-name" data-setting="NAME" placeholder="for example jsmith" spellcheck="false"></div>
     </div>
-    <div style="margin-top:12px"><label for="set-agent">Your agent's URL (fill in during section 2)</label><input id="set-agent" data-setting="AGENT" placeholder="paste the URL of your agent once you've created it" spellcheck="false"></div>
     <p class="muted small" style="margin:8px 0 0">Saved in this browser only. Your metric view will be <code data-tpl>{{CATALOG}}.{{SANDBOX}}.pcard_metrics_{{NAME}}</code>.</p>
   </div>
 </section>
@@ -131,7 +130,7 @@
   <h3>Today's flow</h3>
   <ol>
     <li>Create a bare agent from the six tables.</li>
-    <li>Load 10 "poor" benchmark questions, each with a reference SQL answer.</li>
+    <li>Load 10 worst-practice benchmark questions, each with a reference SQL answer.</li>
     <li>Run the benchmark and record your baseline score.</li>
     <li>Fix the failures, choosing the lowest layer that works.</li>
     <li>Re-run the benchmark and compare.</li>
@@ -149,7 +148,8 @@
     <li><label><input type="checkbox" data-id="l2b"> Genie Code will offer suggestions, such as descriptions and example queries. Hold off on accepting them for now, so your baseline measures a bare agent. You can come back to them in section 4 and see what they add.</label></li>
     <li><label><input type="checkbox" data-id="l2c"> Rename the agent: click <strong>Configure</strong>, scroll down to <strong>About this agent</strong>, click the <strong>pencil icon</strong> next to the name, and paste:</label>
       <p class="q"><span data-tpl>P-Card Benchmarks ({{NAME}})</span></p></li>
-    <li><label><input type="checkbox" data-id="l2d"> Copy the agent's URL from your browser and paste it into <strong>Your agent's URL</strong> in the <a href="#start">settings box</a>, so it's on hand for the next step.</label></li>
+    <li><label><input type="checkbox" data-id="l2d"> Copy the agent's URL from your browser and paste it here, so it's on hand when you load the benchmarks:</label>
+      <div class="settings-box"><label for="set-agent">Your agent's URL</label><input id="set-agent" data-setting="AGENT" placeholder="https://.../genie/rooms/..." spellcheck="false"></div></li>
   </ol>
   <h3>Load the benchmark questions</h3>
   <p>The 10 questions below are written the way people really ask: vague dates, undefined terms and loose wording. Pick one way to load them.</p>
@@ -455,6 +455,6 @@ $$</pre></div></li>
 </main>
 </div>
 
-<script src="app.js?v=2"></script>
+<script src="app.js?v=3"></script>
 </body>
 </html>

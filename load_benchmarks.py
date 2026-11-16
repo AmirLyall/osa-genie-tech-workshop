@@ -2,7 +2,7 @@
 # MAGIC %md
 # MAGIC # NC OSA Genie Workshop (technical): load the benchmark questions
 # MAGIC
-# MAGIC Adds the workshop's 10 "poor" benchmark questions, each with a reference SQL answer, to **your own** Genie Agent.
+# MAGIC Adds the workshop's 10 worst-practice benchmark questions, each with a reference SQL answer, to **your own** Genie Agent.
 # MAGIC
 # MAGIC **How to run:** paste your agent's URL or ID into `agent`, check `catalog` and `schema` point at the workshop tables, then **Run all**.
 # MAGIC It takes a few seconds. Re-running is safe: questions already in the agent are skipped, and nothing else in the agent changes.

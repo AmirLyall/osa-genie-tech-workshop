@@ -8,7 +8,7 @@
   const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
 
   /* ---------- your settings: fill {{CATALOG}}, {{SANDBOX}}, {{NAME}} and {{AGENT}} in every snippet ---------- */
-  const FIELDS = { CATALOG: "<catalog>", SANDBOX: "<your_schema>", NAME: "<yourname>", AGENT: "<your agent URL: add it in the settings box>" };
+  const FIELDS = { CATALOG: "<catalog>", SANDBOX: "<your_schema>", NAME: "<yourname>", AGENT: "<your agent URL: paste it in step 4 above>" };
   const settings = store.get("settings", {});
   const fill = (text) => text.replace(/\{\{(CATALOG|SANDBOX|NAME|AGENT)\}\}/g, (m, k) => (settings[k] || "").trim() || FIELDS[k]);
   $$("[data-tpl]").forEach((el) => { el.dataset.template = el.textContent; });
