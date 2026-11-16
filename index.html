@@ -261,7 +261,7 @@ WHERE m.is_blocked AND t.fiscal_year = 2026</pre></div></div>
 <section id="lab4" class="lab">
   <h2><span class="bullet b-green">4</span> Curate the agent</h2>
   <p class="goal"><strong>Goal:</strong> fix every failure in one pass, putting each piece of logic at the lowest layer that works. <span class="time">12:30 · 15 min</span></p>
-  <p>Work through the four steps in order. In our test, this set of changes took a bare agent from 1 out of 10 to 9 or 10 out of 10 on the first re-run.</p>
+  <p>Work through the four steps in order. In our testing, this set of changes took agents from 1 or 2 out of 10 to 9 or 10 out of 10. The instructions in step 1 do most of the work, so don't skip saving them.</p>
   <h4>Which fix repairs which question</h4>
   <table class="toolbox">
     <thead><tr><th>Benchmark question</th><th>Why a bare agent misses it</th><th>Fix</th></tr></thead>
@@ -281,7 +281,7 @@ WHERE m.is_blocked AND t.fiscal_year = 2026</pre></div></div>
 
   <h3>Step 1: instructions</h3>
   <ol class="steps" data-group="lab4a">
-    <li><label><input type="checkbox" data-id="l4a"> In your agent, click <strong>Configure</strong>, open the <strong>Instructions</strong> tab, and paste these definitions under <strong>General Instructions</strong>. Then save.</label>
+    <li><label><input type="checkbox" data-id="l4a"> In your agent, click <strong>Configure</strong>, open the <strong>Instructions</strong> tab, and paste these definitions under <strong>General Instructions</strong>:</label>
       <div class="codeblock"><pre>The data runs through June 30, 2026. Treat 2026-06-30 as today. &quot;Last quarter&quot; means fiscal year 2026 Q4 (April to June 2026).
 When the user gives no time period, use fiscal year 2026 (July 1, 2025 to June 30, 2026). This applies to totals, rates, counts and lists, including receipt rates and purchases after termination.
 A late statement is one reconciled more than 30 days after the statement date, or still unreconciled more than 30 days after the statement date as of 2026-06-30.
@@ -292,6 +292,11 @@ Cardholder names are not unique. When ranking or totaling by cardholder, group b
 For questions about purchases at places we don&#x27;t allow (blocked merchant categories), return the number of purchases and the total dollars, not a list, unless the user asks for a list.
 Round percentages to one decimal place and dollar amounts to two decimal places.
 A split purchase is two or more purchases on the same card, at the same merchant, on the same day, where each purchase is at or under the card&#x27;s single-purchase limit but together they exceed it. Count each card, merchant and day group once.</pre></div></li>
+  </ol>
+  <ol class="steps" data-group="lab4a2">
+    <li><label><input type="checkbox" data-id="l4a2"> Save the instructions, then close <strong>Configure</strong> and reopen the <strong>Instructions</strong> tab to check the text is still there. This step matters most: in our testing, the same agent scored 5 out of 10 without saved instructions and 10 out of 10 with them.</label></li>
+    <li><label><input type="checkbox" data-id="l4a3"> Quick check: in <strong>Chat</strong>, ask the question below. If Genie asks what you mean, the instructions didn't save.</label>
+      <p class="q">Who are our big spenders?</p></li>
   </ol>
   <div class="callout info"><strong>Want Genie to help?</strong> Click <strong>Generate with Genie</strong> first, keep the overview it writes, and paste the definitions below it. Genie writes a good description of the tables, but it can't know OSA's definitions or that the data stops on June 30, 2026.</div>
 
