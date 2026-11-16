@@ -92,6 +92,7 @@
       <div><label for="set-sandbox">Your schema for the metric view</label><input id="set-sandbox" data-setting="SANDBOX" placeholder="for example adhoc_jsmith" spellcheck="false"></div>
       <div><label for="set-name">Your short name</label><input id="set-name" data-setting="NAME" placeholder="for example jsmith" spellcheck="false"></div>
     </div>
+    <div style="margin-top:12px"><label for="set-agent">Your agent's URL (fill in during section 2)</label><input id="set-agent" data-setting="AGENT" placeholder="paste the URL of your agent once you've created it" spellcheck="false"></div>
     <p class="muted small" style="margin:8px 0 0">Saved in this browser only. Your metric view will be <code data-tpl>{{CATALOG}}.{{SANDBOX}}.pcard_metrics_{{NAME}}</code>.</p>
   </div>
 </section>
@@ -148,7 +149,7 @@
     <li><label><input type="checkbox" data-id="l2b"> Genie Code will offer suggestions, such as descriptions and example queries. Hold off on accepting them for now, so your baseline measures a bare agent. You can come back to them in section 4 and see what they add.</label></li>
     <li><label><input type="checkbox" data-id="l2c"> Rename the agent: click <strong>Configure</strong>, scroll down to <strong>About this agent</strong>, click the <strong>pencil icon</strong> next to the name, and paste:</label>
       <p class="q"><span data-tpl>P-Card Benchmarks ({{NAME}})</span></p></li>
-    <li><label><input type="checkbox" data-id="l2d"> Copy the agent's URL from your browser. You'll need it if you load the benchmarks with the notebook.</label></li>
+    <li><label><input type="checkbox" data-id="l2d"> Copy the agent's URL from your browser and paste it into <strong>Your agent's URL</strong> in the <a href="#start">settings box</a>, so it's on hand for the next step.</label></li>
   </ol>
   <h3>Load the benchmark questions</h3>
   <p>The 10 questions below are written the way people really ask: vague dates, undefined terms and loose wording. Pick one way to load them.</p>
@@ -160,7 +161,10 @@
     <div class="tab-panel active" id="load-nb">
       <ol class="steps" data-group="lab2nb">
         <li><label><input type="checkbox" data-id="l2e"> Download <a href="load_benchmarks.py" download><code>load_benchmarks.py</code></a> and import it into your workspace folder (<strong>Workspace</strong>, then <strong>Import</strong>).</label></li>
-        <li><label><input type="checkbox" data-id="l2f"> Fill in the widgets: <code>agent</code> (paste your agent's URL) and <code>catalog</code> (the catalog of the workshop tables). Leave <code>schema</code> as <code>osa_pcard_review</code>.</label></li>
+        <li><label><input type="checkbox" data-id="l2f"> Fill in the widgets, copying from below. Leave <code>schema</code> as <code>osa_pcard_review</code>.</label>
+          <p class="q"><span data-tpl>{{AGENT}}</span></p>
+          <p class="muted small">That's <code>agent</code>. And this is <code>catalog</code>:</p>
+          <p class="q"><span data-tpl>{{CATALOG}}</span></p></li>
         <li><label><input type="checkbox" data-id="l2g"> Connect to <strong>Serverless</strong> and click <strong>Run all</strong>. It prints "Added 10 benchmark question(s)". Re-running is safe and never creates duplicates.</label></li>
       </ol>
     </div>
@@ -451,6 +455,6 @@ $$</pre></div></li>
 </main>
 </div>
 
-<script src="app.js?v=1"></script>
+<script src="app.js?v=2"></script>
 </body>
 </html>

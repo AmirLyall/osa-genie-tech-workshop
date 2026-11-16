@@ -7,10 +7,10 @@
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
 
-  /* ---------- your settings: fill {{CATALOG}}, {{SANDBOX}} and {{NAME}} in every snippet ---------- */
-  const FIELDS = { CATALOG: "<catalog>", SANDBOX: "<your_schema>", NAME: "<yourname>" };
+  /* ---------- your settings: fill {{CATALOG}}, {{SANDBOX}}, {{NAME}} and {{AGENT}} in every snippet ---------- */
+  const FIELDS = { CATALOG: "<catalog>", SANDBOX: "<your_schema>", NAME: "<yourname>", AGENT: "<your agent URL: add it in the settings box>" };
   const settings = store.get("settings", {});
-  const fill = (text) => text.replace(/\{\{(CATALOG|SANDBOX|NAME)\}\}/g, (m, k) => (settings[k] || "").trim() || FIELDS[k]);
+  const fill = (text) => text.replace(/\{\{(CATALOG|SANDBOX|NAME|AGENT)\}\}/g, (m, k) => (settings[k] || "").trim() || FIELDS[k]);
   $$("[data-tpl]").forEach((el) => { el.dataset.template = el.textContent; });
   function render() { $$("[data-tpl]").forEach((el) => { el.textContent = fill(el.dataset.template); }); }
   $$(".settings-box input[data-setting]").forEach((input) => {
