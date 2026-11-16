@@ -10,7 +10,10 @@
   /* ---------- your settings: fill {{CATALOG}}, {{SANDBOX}}, {{NAME}} and {{AGENT}} in every snippet ---------- */
   const FIELDS = { CATALOG: "<catalog>", SCHEMA: "osa_pcard_review", SANDBOX: "<your_schema>", NAME: "<yourname>", AGENT: "<your agent URL: paste it in step 4 above>" };
   const settings = store.get("settings", {});
-  const fill = (text) => text.replace(/\{\{(CATALOG|SCHEMA|SANDBOX|NAME|AGENT)\}\}/g, (m, k) => (settings[k] || "").trim() || FIELDS[k]);
+  // AGENT_ID is the 32-character ID inside the agent URL.
+  const agentId = () => ((settings.AGENT || "").match(/[0-9a-f]{32}/) || [])[0] || "<your agent ID: paste the agent URL in section 2>";
+  const fill = (text) => text.replace(/\{\{AGENT_ID\}\}/g, agentId)
+    .replace(/\{\{(CATALOG|SCHEMA|SANDBOX|NAME|AGENT)\}\}/g, (m, k) => (settings[k] || "").trim() || FIELDS[k]);
   $$("[data-tpl]").forEach((el) => { el.dataset.template = el.textContent; });
   function render() { $$("[data-tpl]").forEach((el) => { el.textContent = fill(el.dataset.template); }); }
   $$(".settings-box input[data-setting]").forEach((input) => {

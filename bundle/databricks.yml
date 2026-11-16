@@ -1,0 +1,25 @@
+# Starter configuration for the NC OSA Genie workshop bundle.
+# Next step: databricks bundle generate genie-space --existing-id <agent ID> --key pcard_review
+bundle:
+  name: osa-pcard-genie
+  engine: direct # Genie agents need the direct deployment engine
+
+include:
+  - resources/*.yml
+
+targets:
+  dev:
+    mode: development
+    default: true
+
+  prod:
+    workspace:
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/prod
+    resources:
+      genie_spaces:
+        pcard_review:
+          title: "P-Card Review (Production)"
+          # Uncomment and set the auditors' group before sharing:
+          # permissions:
+          #   - level: CAN_RUN
+          #     group_name: <auditors group>

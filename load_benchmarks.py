@@ -51,18 +51,19 @@ print(f"Agent  : {space.get('title')} ({SPACE_ID})\nTables : {CATALOG}.{SCHEMA}"
 # COMMAND ----------
 
 BENCHMARKS = [
+# Reference answers return only the columns the question needs. The judge fails an answer that is missing a
+# reference column, but extra columns are fine. When a question gives no period, the answer is fiscal year 2026.
 ("How much did we spend last quarter?",
 f"""SELECT ROUND(SUM(amount), 2) AS total_spend
 FROM {S}.transactions
 WHERE fiscal_year = 2026 AND fiscal_quarter = 'Q4'"""),
 ("Which agencies have bad receipt compliance?",
-f"""SELECT a.agency_code, a.agency_name,
+f"""SELECT a.agency_name,
        ROUND(100 * AVG(CASE WHEN t.receipt_attached THEN 1 ELSE 0 END), 1) AS receipt_compliance_pct
 FROM {S}.transactions t JOIN {S}.agencies a ON t.agency_code = a.agency_code
 WHERE t.fiscal_year = 2026
-GROUP BY a.agency_code, a.agency_name
-HAVING ROUND(100 * AVG(CASE WHEN t.receipt_attached THEN 1 ELSE 0 END), 1) < 90
-ORDER BY receipt_compliance_pct ASC"""),
+GROUP BY a.agency_name
+HAVING ROUND(100 * AVG(CASE WHEN t.receipt_attached THEN 1 ELSE 0 END), 1) < 90"""),
 ("What's our receipt rate?",
 f"""SELECT ROUND(100 * AVG(CASE WHEN receipt_attached THEN 1 ELSE 0 END), 1) AS receipt_compliance_pct
 FROM {S}.transactions
@@ -76,33 +77,32 @@ WHERE (reconciled AND days_to_reconcile > 30)
 f"""SELECT COUNT(*) AS split_purchase_groups FROM (
   SELECT t.card_id
   FROM {S}.transactions t JOIN {S}.cardholders c ON t.card_id = c.card_id
+  WHERE t.fiscal_year = 2026
   GROUP BY t.card_id, t.merchant_name, t.transaction_date, c.single_purchase_limit
   HAVING COUNT(*) >= 2 AND MAX(t.amount) <= c.single_purchase_limit AND SUM(t.amount) > c.single_purchase_limit
 )"""),
 ("Who kept spending after they left?",
-f"""SELECT c.card_id, c.cardholder_name, c.agency_code, c.termination_date,
+f"""SELECT c.cardholder_name,
        COUNT(*) AS purchases_after_termination, ROUND(SUM(t.amount), 2) AS total_after_termination
 FROM {S}.transactions t JOIN {S}.cardholders c ON t.card_id = c.card_id
-WHERE c.termination_date IS NOT NULL AND t.transaction_date > c.termination_date
-GROUP BY c.card_id, c.cardholder_name, c.agency_code, c.termination_date
-ORDER BY total_after_termination DESC"""),
+WHERE c.termination_date IS NOT NULL AND t.transaction_date > c.termination_date AND t.fiscal_year = 2026
+GROUP BY c.card_id, c.cardholder_name"""),
 ("Total spend by department FY26",
 f"""SELECT a.agency_name, ROUND(SUM(t.amount), 2) AS total_spend
 FROM {S}.transactions t JOIN {S}.agencies a ON t.agency_code = a.agency_code
 WHERE t.fiscal_year = 2026
-GROUP BY a.agency_name
-ORDER BY total_spend DESC"""),
+GROUP BY a.agency_name"""),
 ("Which cards are dormant?",
-f"""SELECT COUNT(*) AS dormant_cards
+f"""SELECT c.card_id, c.cardholder_name
 FROM {S}.cardholders c
 WHERE c.card_status = 'Active'
   AND NOT EXISTS (SELECT 1 FROM {S}.transactions t
                   WHERE t.card_id = c.card_id AND t.transaction_date > DATE'2026-04-01')"""),
 ("Who are our big spenders?",
-f"""SELECT c.card_id, c.cardholder_name, c.agency_code, ROUND(SUM(t.amount), 2) AS fy2026_spend
+f"""SELECT c.cardholder_name, ROUND(SUM(t.amount), 2) AS fy2026_spend
 FROM {S}.transactions t JOIN {S}.cardholders c ON t.card_id = c.card_id
 WHERE t.fiscal_year = 2026
-GROUP BY c.card_id, c.cardholder_name, c.agency_code
+GROUP BY c.card_id, c.cardholder_name
 ORDER BY fy2026_spend DESC
 LIMIT 10"""),
 ("Purchases at places we don't allow this year",

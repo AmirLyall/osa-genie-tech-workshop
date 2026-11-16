@@ -22,22 +22,22 @@
   <details class="faq" open><summary>Before the session</summary>
   <ol>
     <li>Confirm the administrator checklist on the <a href="setup.html">setup page</a>, including the schema attendees will use for their metric views.</li>
-    <li>Build your own demo agent, load the benchmarks, and run a baseline, so you have a finished run to show if a live run is slow.</li>
-    <li>Make a second identical agent for Workbench. At 12:00, start Auto-Optimize on it so results are ready to discuss at 12:45.</li>
+    <li>Run the whole flow yourself once: create an agent, load the benchmarks, run a baseline, curate it, re-run, and deploy the bundle. Keep that agent as your demo, so you have finished runs to show if a live run is slow.</li>
+    <li>Check that attendees can run the Databricks CLI (version 1.3.0 or later) against the workspace, from their laptop or the web terminal.</li>
     <li>Hybrid room: share one browser window at a large zoom, and have a second person watch the meeting chat for errors people hit.</li>
   </ol></details>
   <details class="faq" open><summary>Run of show</summary>
   <table class="agenda">
     <thead><tr><th>Time</th><th>Block</th><th>Show and say</th></tr></thead>
     <tbody>
-      <tr><td class="slot">12:00 (10)</td><td>Kickoff</td><td>Start Auto-Optimize first. Walk the layers pyramid and the flow. Explain how a benchmark scores, and that a low baseline is the point.</td></tr>
-      <tr><td class="slot">12:10 (10)</td><td>Create and seed</td><td>Create the agent live, hold off on Genie Code suggestions, rename it. Load the benchmarks with the notebook. Point anyone stuck to the by-hand tab.</td></tr>
-      <tr><td class="slot">12:20 (10)</td><td>Baseline</td><td>Open Benchmark, then Questions, and click Run all benchmarks. Open the run in Evaluations. Open two failures and read the score reason and judge analysis: "dormant" (a clarifying question) and "late statements" (the wrong definition).</td></tr>
-      <tr><td class="slot">12:30 (15)</td><td>Improve</td><td>Review proposed fixes and debate each snippet before accepting it. Run the Genie Code prompt, review its metric view draft, run it in the SQL editor, and add it to the agent. Generate the instructions with Genie and check them against the definitions. Add the parameterized example with usage guidance. Fill any gaps from the answer key, and ask the room which fix they'd move lower in the pyramid.</td></tr>
-      <tr><td class="slot">12:45 (15)</td><td>Re-run and next steps</td><td>Re-run and compare. Show the Workbench IQ scan and the Auto-Optimize results. Close with the production checklist and the homework.</td></tr>
+      <tr><td class="slot">12:00 (10)</td><td>Kickoff</td><td>Walk the layers pyramid, the poorly worded vs. well worded table, and the flow. Explain how the judge grades: a missing reference column fails, extra columns don't.</td></tr>
+      <tr><td class="slot">12:10 (10)</td><td>Create and seed</td><td>Create the agent live, hold off on Genie Code suggestions, rename it, paste the URL. Load the benchmarks with the notebook, and point anyone stuck to the by-hand tab.</td></tr>
+      <tr><td class="slot">12:20 (10)</td><td>Baseline</td><td>Run all benchmarks and open the run. Read the score reason and judge analysis on "big spenders" (a clarifying question) and "split purchases" (the wrong period).</td></tr>
+      <tr><td class="slot">12:30 (15)</td><td>Curate</td><td>Apply the four steps in order: instructions, three example queries, the metric view, the synonym. Point out which layer each one is in, and why.</td></tr>
+      <tr><td class="slot">12:45 (15)</td><td>Re-run and keep as code</td><td>Re-run and compare. Generate the bundle from your agent, open the JSON, and deploy the production copy. Close with a sentence on Genie Workbench and the production checklist.</td></tr>
     </tbody>
   </table></details>
-  <details class="faq"><summary>If something breaks</summary><p>If the notebook can't load benchmarks, switch the room to the by-hand tab and have people add the first five. If a metric view fails, check the schema permission and carry on with the other fixes. The before-and-after still shows.</p></details>
+  <details class="faq"><summary>If something breaks</summary><p>If the notebook can't load benchmarks, switch the room to the by-hand tab and have people add the first five. If a metric view fails, check the schema permission and carry on with the other fixes. If the CLI isn't available, deploy the bundle from your screen.</p></details>
 </section>
 <footer><img src="databricks-logo.svg" alt="Databricks"><span><a href="./">Workshop guide</a> · <a href="setup.html">Setup</a> · <a href="facilitator.html">Facilitator guide</a></span></footer>
 </main>

@@ -28,11 +28,11 @@
   <p class="eyebrow">Tue, Nov 17, 2026 · 12:00 to 1:00 PM ET · NC Office of the State Auditor, Raleigh and virtual</p>
   <h1>Measure it. Fix it.<br>Measure again.</h1>
   <p class="lead">A hands-on hour for OSA's technical team on making a Genie Agent reliable. You'll build an agent from a set of P-card tables,
-  score it with a set of <strong>poorly worded questions</strong> written the way people really ask, fix what fails at the right layer, and <strong>re-run the benchmark</strong> to prove the fixes worked.</p>
+  score it with a set of <strong>poorly worded questions</strong> written the way people really ask, fix what fails at the right layer, and <strong>re-run the benchmark</strong> to prove the fixes worked. Then you'll save the result as code.</p>
   <div class="cards three">
     <div class="card domain fin"><h3>Benchmarks</h3><p>Questions with known right answers, so "it seems better" becomes a score you can track after every change.</p></div>
     <div class="card domain perf"><h3>Improvement layers</h3><p>Instructions, example queries, metric views and agent-level metadata. Each fixes a different kind of failure.</p></div>
-    <div class="card domain rr"><h3>Genie Workbench</h3><p>A Databricks App that scores agent quality and runs benchmark-driven optimization in the background.</p></div>
+    <div class="card domain rr"><h3>Agents as code</h3><p>A Declarative Automation Bundle captures the curated agent, benchmarks included, so it can be reviewed in Git and deployed again.</p></div>
   </div>
   <div class="hero-ctas">
     <a class="btn" href="#start">Get ready (5 min)</a>
@@ -52,8 +52,8 @@
     <a href="#lab1"><span class="bullet sm b-red">1</span>Kickoff</a>
     <a href="#lab2"><span class="bullet sm b-blue">2</span>Create and seed</a>
     <a href="#lab3"><span class="bullet sm b-yellow">3</span>Baseline benchmark</a>
-    <a href="#lab4"><span class="bullet sm b-green">4</span>Improve the agent</a>
-    <a href="#lab5"><span class="bullet sm b-purple">5</span>Re-run and next steps</a>
+    <a href="#lab4"><span class="bullet sm b-green">4</span>Curate the agent</a>
+    <a href="#lab5"><span class="bullet sm b-purple">5</span>Re-run and keep as code</a>
     <a href="#homework"><span class="stop"></span>After the session</a>
     <a href="#cheatsheet"><span class="stop"></span>Cheat sheet</a>
     <a href="#troubleshooting"><span class="stop"></span>Troubleshooting &amp; FAQ</a>
@@ -71,8 +71,8 @@
       <tr class="lab-row"><td class="slot">12:00 to 12:10</td><td>Kickoff</td><td><span class="bullet sm b-red">1</span> <a href="#lab1">The reliability layers, today's flow, how benchmarks score</a></td></tr>
       <tr class="lab-row"><td class="slot">12:10 to 12:20</td><td>Create and seed your agent</td><td><span class="bullet sm b-blue">2</span> <a href="#lab2">Create the agent, add the tables, load the benchmark questions</a></td></tr>
       <tr class="lab-row"><td class="slot">12:20 to 12:30</td><td>Baseline benchmark</td><td><span class="bullet sm b-yellow">3</span> <a href="#lab3">Run it, read the results, have Genie analyze the failures</a></td></tr>
-      <tr class="lab-row"><td class="slot">12:30 to 12:45</td><td>Improve the agent</td><td><span class="bullet sm b-green">4</span> <a href="#lab4">Instructions, example queries, a metric view, synonyms</a></td></tr>
-      <tr class="lab-row"><td class="slot">12:45 to 1:00</td><td>Re-run, compare, next steps</td><td><span class="bullet sm b-purple">5</span> <a href="#lab5">Re-run the benchmark, Genie Workbench results, Q&amp;A</a></td></tr>
+      <tr class="lab-row"><td class="slot">12:30 to 12:45</td><td>Curate the agent</td><td><span class="bullet sm b-green">4</span> <a href="#lab4">Instructions, example queries, a metric view, a synonym</a></td></tr>
+      <tr class="lab-row"><td class="slot">12:45 to 1:00</td><td>Re-run and keep it as code</td><td><span class="bullet sm b-purple">5</span> <a href="#lab5">Re-run the benchmark, save the agent as a bundle, Q&amp;A</a></td></tr>
     </tbody>
   </table>
   <p class="muted small">Questions are welcome at any point. If you're joining remotely, drop them in the meeting chat and we'll pick them up as we go.</p>
@@ -135,8 +135,10 @@
     <li>Run the benchmark and record your baseline score.</li>
     <li>Fix the failures, choosing the lowest layer that works.</li>
     <li>Re-run the benchmark and compare.</li>
+    <li>Save the curated agent as a bundle, so it can be versioned and promoted.</li>
   </ol>
-  <div class="callout info"><strong>How a benchmark scores.</strong> For each question, Genie answers as it would for a user, and its result is compared with the result of your reference SQL. The run reports an accuracy score, and you can open any question to compare Genie's output with the ground truth.</div>
+  <div class="callout info"><strong>How a benchmark scores.</strong> For each question, Genie answers as it would for a user, and a judge compares its result with the result of your reference SQL.
+  An answer fails if it's missing a column the reference returns, has extra rows, or a value differs. Extra columns are fine. So keep reference answers to the columns the question really needs, and decide the rules up front, such as which period to use when a question doesn't say.</div>
 </section>
 
 <!-- ============================================================ LAB 2 -->
@@ -180,13 +182,12 @@ FROM `{{CATALOG}}`.`{{SCHEMA}}`.transactions
 WHERE fiscal_year = 2026 AND fiscal_quarter = &#x27;Q4&#x27;</pre></div></div>
   <div class="bench-item"><h4>Question 2</h4>
     <p class="q">Which agencies have bad receipt compliance?</p>
-    <div class="codeblock"><pre data-tpl>SELECT a.agency_code, a.agency_name,
+    <div class="codeblock"><pre data-tpl>SELECT a.agency_name,
        ROUND(100 * AVG(CASE WHEN t.receipt_attached THEN 1 ELSE 0 END), 1) AS receipt_compliance_pct
 FROM `{{CATALOG}}`.`{{SCHEMA}}`.transactions t JOIN `{{CATALOG}}`.`{{SCHEMA}}`.agencies a ON t.agency_code = a.agency_code
 WHERE t.fiscal_year = 2026
-GROUP BY a.agency_code, a.agency_name
-HAVING ROUND(100 * AVG(CASE WHEN t.receipt_attached THEN 1 ELSE 0 END), 1) &lt; 90
-ORDER BY receipt_compliance_pct ASC</pre></div></div>
+GROUP BY a.agency_name
+HAVING ROUND(100 * AVG(CASE WHEN t.receipt_attached THEN 1 ELSE 0 END), 1) &lt; 90</pre></div></div>
   <div class="bench-item"><h4>Question 3</h4>
     <p class="q">What&#x27;s our receipt rate?</p>
     <div class="codeblock"><pre data-tpl>SELECT ROUND(100 * AVG(CASE WHEN receipt_attached THEN 1 ELSE 0 END), 1) AS receipt_compliance_pct
@@ -203,37 +204,36 @@ WHERE (reconciled AND days_to_reconcile &gt; 30)
     <div class="codeblock"><pre data-tpl>SELECT COUNT(*) AS split_purchase_groups FROM (
   SELECT t.card_id
   FROM `{{CATALOG}}`.`{{SCHEMA}}`.transactions t JOIN `{{CATALOG}}`.`{{SCHEMA}}`.cardholders c ON t.card_id = c.card_id
+  WHERE t.fiscal_year = 2026
   GROUP BY t.card_id, t.merchant_name, t.transaction_date, c.single_purchase_limit
   HAVING COUNT(*) &gt;= 2 AND MAX(t.amount) &lt;= c.single_purchase_limit AND SUM(t.amount) &gt; c.single_purchase_limit
 )</pre></div></div>
   <div class="bench-item"><h4>Question 6</h4>
     <p class="q">Who kept spending after they left?</p>
-    <div class="codeblock"><pre data-tpl>SELECT c.card_id, c.cardholder_name, c.agency_code, c.termination_date,
+    <div class="codeblock"><pre data-tpl>SELECT c.cardholder_name,
        COUNT(*) AS purchases_after_termination, ROUND(SUM(t.amount), 2) AS total_after_termination
 FROM `{{CATALOG}}`.`{{SCHEMA}}`.transactions t JOIN `{{CATALOG}}`.`{{SCHEMA}}`.cardholders c ON t.card_id = c.card_id
-WHERE c.termination_date IS NOT NULL AND t.transaction_date &gt; c.termination_date
-GROUP BY c.card_id, c.cardholder_name, c.agency_code, c.termination_date
-ORDER BY total_after_termination DESC</pre></div></div>
+WHERE c.termination_date IS NOT NULL AND t.transaction_date &gt; c.termination_date AND t.fiscal_year = 2026
+GROUP BY c.card_id, c.cardholder_name</pre></div></div>
   <div class="bench-item"><h4>Question 7</h4>
     <p class="q">Total spend by department FY26</p>
     <div class="codeblock"><pre data-tpl>SELECT a.agency_name, ROUND(SUM(t.amount), 2) AS total_spend
 FROM `{{CATALOG}}`.`{{SCHEMA}}`.transactions t JOIN `{{CATALOG}}`.`{{SCHEMA}}`.agencies a ON t.agency_code = a.agency_code
 WHERE t.fiscal_year = 2026
-GROUP BY a.agency_name
-ORDER BY total_spend DESC</pre></div></div>
+GROUP BY a.agency_name</pre></div></div>
   <div class="bench-item"><h4>Question 8</h4>
     <p class="q">Which cards are dormant?</p>
-    <div class="codeblock"><pre data-tpl>SELECT COUNT(*) AS dormant_cards
+    <div class="codeblock"><pre data-tpl>SELECT c.card_id, c.cardholder_name
 FROM `{{CATALOG}}`.`{{SCHEMA}}`.cardholders c
 WHERE c.card_status = &#x27;Active&#x27;
   AND NOT EXISTS (SELECT 1 FROM `{{CATALOG}}`.`{{SCHEMA}}`.transactions t
                   WHERE t.card_id = c.card_id AND t.transaction_date &gt; DATE&#x27;2026-04-01&#x27;)</pre></div></div>
   <div class="bench-item"><h4>Question 9</h4>
     <p class="q">Who are our big spenders?</p>
-    <div class="codeblock"><pre data-tpl>SELECT c.card_id, c.cardholder_name, c.agency_code, ROUND(SUM(t.amount), 2) AS fy2026_spend
+    <div class="codeblock"><pre data-tpl>SELECT c.cardholder_name, ROUND(SUM(t.amount), 2) AS fy2026_spend
 FROM `{{CATALOG}}`.`{{SCHEMA}}`.transactions t JOIN `{{CATALOG}}`.`{{SCHEMA}}`.cardholders c ON t.card_id = c.card_id
 WHERE t.fiscal_year = 2026
-GROUP BY c.card_id, c.cardholder_name, c.agency_code
+GROUP BY c.card_id, c.cardholder_name
 ORDER BY fy2026_spend DESC
 LIMIT 10</pre></div></div>
   <div class="bench-item"><h4>Question 10</h4>
@@ -253,78 +253,49 @@ WHERE m.is_blocked AND t.fiscal_year = 2026</pre></div></div>
     <li><label><input type="checkbox" data-id="l3c"> Click two or three of the failed questions. Each one shows a <strong>Score reason</strong>, such as Extra Rows or Aggregation Issue, and a <strong>Judge analysis</strong> that explains how Genie's query differs from the reference. Turn on <strong>Show diff view</strong> to compare the SQL side by side.</label></li>
     <li><label><input type="checkbox" data-id="l3d"> For each failure, decide what kind of miss it is: a missing definition, the wrong time period, a clarifying question, or the right numbers in a different shape. That tells you which layer will fix it.</label></li>
   </ol>
-  <div class="callout tip"><strong>Expect a low score.</strong> When we asked a bare agent these 10 questions, it got about 3 right. The column descriptions in Unity Catalog carried it on split purchases and terminated cardholders. On "dormant" it asked for clarification, and on "big spenders" it returned nothing.</div>
+  <div class="callout tip"><strong>Expect a low score.</strong> In our test, a bare agent scored 1 out of 10 on the Benchmark page. It asked what "big spenders" meant, counted every year when no period was given, and listed blocked purchases instead of totaling them.</div>
   <div class="callout info"><strong>Not every miss is wrong.</strong> Sometimes Genie returns the right numbers with extra columns. Treat those as formatting, not logic, and decide whether the benchmark or the agent should change.</div>
 </section>
 
 <!-- ============================================================ LAB 4 -->
 <section id="lab4" class="lab">
-  <h2><span class="bullet b-green">4</span> Improve the agent</h2>
-  <p class="goal"><strong>Goal:</strong> fix the failures, choosing the lowest layer that works for each. <span class="time">12:30 · 15 min</span></p>
-  <h3>Step 1: review Genie's proposed fixes</h3>
-  <ol class="steps" data-group="lab4r">
-    <li><label><input type="checkbox" data-id="l4r1"> In your evaluation run, click <strong>Review proposed fixes</strong>. Genie turns the failures into knowledge snippets, such as a definition of "places we don't allow" or the join between purchases and merchant categories.</label></li>
-    <li><label><input type="checkbox" data-id="l4r2"> Read each snippet before accepting it. Does it match OSA's definition? For example, is the suggested "late statements" filter the same as card policy? Accept the ones that are right, reject the rest, and click <strong>Accept</strong>.</label></li>
-  </ol>
-  <h3>Step 2: have Genie Code build a metric view</h3>
-  <ol class="steps" data-group="lab4g">
-    <li><label><input type="checkbox" data-id="l4g1"> Open <strong>Genie Code</strong> in your agent and paste:</label>
-      <p class="q"><span data-tpl>Review this agent's tables, column descriptions and benchmark results. Suggest the business terms that need a glossary definition, the metrics that should live in a metric view instead of text instructions, and any joins that should be defined. Then write a complete CREATE OR REPLACE VIEW ... WITH METRICS LANGUAGE YAML statement for a metric view named {{CATALOG}}.{{SANDBOX}}.pcard_metrics_{{NAME}} over the transactions table, with joins to the other tables, and a comment and synonyms on every dimension and measure.</span></p></li>
-    <li><label><input type="checkbox" data-id="l4g2"> Read the draft before running it. Do the measures match OSA's definitions, such as receipt compliance as a percentage? Ask Genie Code to fix anything that's off.</label></li>
-    <li><label><input type="checkbox" data-id="l4g3"> Copy the statement into the <strong>SQL editor</strong> and run it. If it fails, paste the error back into Genie Code and ask for a fix.</label></li>
-    <li><label><input type="checkbox" data-id="l4g4"> Add it to your agent: click <strong>Configure</strong>, then <strong>Data</strong>, then <strong>Add</strong>, and choose <code data-tpl>{{CATALOG}}.{{SANDBOX}}.pcard_metrics_{{NAME}}</code>.</label></li>
-    <li><label><input type="checkbox" data-id="l4g5"> Compare Genie Code's glossary and measures with the answer key below. Which terms did it find? Did it put each one at the lowest layer that works?</label></li>
-  </ol>
-  <h3>Step 3: generate the instructions with Genie</h3>
-  <ol class="steps" data-group="lab4i">
-    <li><label><input type="checkbox" data-id="l4i1"> In your agent, click <strong>Configure</strong>, open the <strong>Instructions</strong> tab, and under <strong>General Instructions</strong> click <strong>Generate with Genie</strong>. Do this after steps 1 and 2, so Genie can refer to the snippets you accepted and your metric view.</label></li>
-    <li><label><input type="checkbox" data-id="l4i2"> Read what it wrote. Check it against the definitions below, and add any it missed. The one Genie can't know is that the data stops on June 30, 2026, so "last 90 days" and "as of today" need that date.</label></li>
-    <li><label><input type="checkbox" data-id="l4i3"> Save the instructions.</label></li>
-  </ol>
-  <details class="faq"><summary>See an example of what Genie generated in a dry run</summary><div class="codeblock"><pre>This agent supports P-Card (procurement card) program review for state government agencies, used by auditors and program managers to monitor spending, compliance, and risk.
-
-The fiscal year follows the North Carolina state schedule: July 1 through June 30. FY2026 runs from July 1, 2025 through June 30, 2026. Data covers FY2025 and FY2026. When the user says &quot;this year,&quot; &quot;current year,&quot; or &quot;this fiscal year&quot; without specifying, assume FY2026. Use the &quot;Current fiscal year default&quot; filter.
-
-All dollar amounts are in US dollars and are always positive. Round dollar outputs to two decimal places; round percentages to one decimal place.
-
-There are 12 state agencies (departments). Users may refer to them by full name (e.g. &quot;Department of Roads and Bridges&quot;) or by agency code (e.g. &quot;DRB&quot;). Always join to the agencies table to resolve names.
-
-Key audit areas:
-- Blocked merchant purchases: transactions at merchant categories that are not allowed. Use the &quot;places we don&#x27;t allow&quot; filter to identify them.
-- Split purchases: a cardholder breaks one purchase into multiple smaller transactions at the same merchant on the same day to stay under their single-purchase limit. Detected when the same card_id, merchant_name, and transaction_date have 2 or more transactions where each individual amount is within the cardholder&#x27;s single_purchase_limit but their combined total exceeds it.
-- Receipt compliance: the percentage of transactions with a receipt attached. Use the &quot;receipt rate percentage&quot; measure. Below 90% is considered poor; use the &quot;bad receipt compliance&quot; filter to find agencies that fall short.
-- Dormant cards: active cards with no recent transactions. Use the &quot;dormant cards&quot; filter.
-- Post-termination spending: transactions where the transaction_date is after the cardholder&#x27;s termination_date. This represents unauthorized use.
-- Late statement reconciliation: statements not reconciled within 30 days. Use the &quot;late statements&quot; filter.
-
-Budget comparisons: agency_budgets holds each agency&#x27;s annual P-Card budget allocation by fiscal year. Compare actual spending from transactions against the budget to calculate utilization. Use the &quot;Budget utilization by agency&quot; SQL example as a pattern.</pre></div></details>
-  <h3>Step 4: fill the gaps from the answer key</h3>
-  <p>The fixes below are the answer key for this benchmark. Use them for anything the proposed fixes and Genie Code didn't cover, or apply them all if you're short on time.</p>
+  <h2><span class="bullet b-green">4</span> Curate the agent</h2>
+  <p class="goal"><strong>Goal:</strong> fix every failure in one pass, putting each piece of logic at the lowest layer that works. <span class="time">12:30 · 15 min</span></p>
+  <p>Work through the four steps in order. In our test, this set of changes took a bare agent from 1 out of 10 to 9 or 10 out of 10 on the first re-run.</p>
   <h4>Which fix repairs which question</h4>
   <table class="toolbox">
     <thead><tr><th>Benchmark question</th><th>Why a bare agent misses it</th><th>Fix</th></tr></thead>
     <tbody>
-      <tr><td>How many statements were late?</td><td>"Late" isn't defined, so it ignores statements that are still unreconciled.</td><td>Example query, plus an instruction</td></tr>
-      <tr><td>Which cards are dormant?</td><td>"Dormant" isn't defined, so it asks for clarification.</td><td>Example query, plus an instruction</td></tr>
-      <tr><td>Who are our big spenders?</td><td>No definition of "big spenders" or the time period.</td><td>Instruction</td></tr>
-      <tr><td>Which agencies have bad receipt compliance?</td><td>No threshold for "bad", and the rate comes back as a fraction.</td><td>Metric view measure, plus an instruction</td></tr>
-      <tr><td>What's our receipt rate?</td><td>Extra columns and no agreed calculation.</td><td>Metric view measure</td></tr>
-      <tr><td>Purchases at places we don't allow this year</td><td>Lists every row instead of a count and total.</td><td>Metric view synonym, plus an instruction</td></tr>
-      <tr><td>Total spend by department FY26</td><td>"Department" isn't a column name.</td><td>Synonym on the agency name</td></tr>
+      <tr><td>How many statements were late?</td><td>"Late" isn't defined, so it leaves out statements that are still unreconciled.</td><td>Example query, plus an instruction</td></tr>
+      <tr><td>Which cards are dormant?</td><td>"Dormant" isn't defined, so it guesses its own window.</td><td>Example query that lists the cards, plus an instruction</td></tr>
+      <tr><td>Who are our big spenders?</td><td>"Big spenders" isn't defined, so it asks for clarification.</td><td>Instruction, including "group by card_id"</td></tr>
+      <tr><td>How much did we spend last quarter?</td><td>It counts back from the latest date it finds, not the fiscal calendar.</td><td>Instruction on the data's end date and fiscal quarters</td></tr>
+      <tr><td>How many split purchases were there?</td><td>No time period, so it counts every year.</td><td>Instruction: no period means fiscal year 2026</td></tr>
+      <tr><td>Who kept spending after they left?</td><td>No time period, and it returns every column it can find.</td><td>Instruction: no period means fiscal year 2026</td></tr>
+      <tr><td>Which agencies have bad receipt compliance?</td><td>No threshold for "bad".</td><td>Metric view measure, plus an instruction</td></tr>
+      <tr><td>What's our receipt rate?</td><td>No time period and no agreed calculation.</td><td>Metric view measure, plus the default period</td></tr>
+      <tr><td>Purchases at places we don't allow this year</td><td>Lists every purchase instead of a count and total.</td><td>Proposed-fix snippet, plus an instruction on the answer shape</td></tr>
+      <tr><td>Total spend by department FY26</td><td>Usually right: "department" maps to agency name.</td><td>Synonym on the agency name, to make it reliable</td></tr>
     </tbody>
   </table>
 
-  <h4>Fix 1: definitions your instructions should cover</h4>
+  <h3>Step 1: instructions</h3>
   <ol class="steps" data-group="lab4a">
-    <li><label><input type="checkbox" data-id="l4a"> If Genie's generated instructions miss any of these, add them under <strong>Configure</strong>, <strong>Instructions</strong>, <strong>General Instructions</strong>:</label>
-      <div class="codeblock"><pre>The data runs through June 30, 2026. Treat 2026-06-30 as today. &quot;This year&quot; means fiscal year 2026, and &quot;last quarter&quot; means fiscal year 2026 Q4 (April to June 2026).
+    <li><label><input type="checkbox" data-id="l4a"> In your agent, click <strong>Configure</strong>, open the <strong>Instructions</strong> tab, and paste these definitions under <strong>General Instructions</strong>. Then save.</label>
+      <div class="codeblock"><pre>The data runs through June 30, 2026. Treat 2026-06-30 as today. &quot;Last quarter&quot; means fiscal year 2026 Q4 (April to June 2026).
+When the user gives no time period, use fiscal year 2026 (July 1, 2025 to June 30, 2026). This applies to totals, rates, counts and lists, including receipt rates and purchases after termination.
 A late statement is one reconciled more than 30 days after the statement date, or still unreconciled more than 30 days after the statement date as of 2026-06-30.
-A dormant card is an Active card with no purchases from April 1 through June 30, 2026. Return a count unless the user asks for a list.
-Bad receipt compliance means a receipt compliance rate below 90% for the fiscal year. Report compliance as a percentage rounded to one decimal.
-Big spenders are the top 10 cardholders by total spend in fiscal year 2026.
-&quot;Places we don&#x27;t allow&quot; means blocked merchant categories. Return a count and total dollars unless the user asks for a list.</pre></div></li>
+A dormant card is an Active card with no purchases from April 1 through June 30, 2026. List the cards; give a count only if the user asks how many.
+Bad receipt compliance means a receipt compliance rate below 90% for the fiscal year. 
+Big spenders are the top 10 cardholders by total spend in the period. Show the cardholder name and their spend.
+Cardholder names are not unique. When ranking or totaling by cardholder, group by card_id and show the cardholder name.
+For questions about purchases at places we don&#x27;t allow (blocked merchant categories), return the number of purchases and the total dollars, not a list, unless the user asks for a list.
+Round percentages to one decimal place and dollar amounts to two decimal places.
+A split purchase is two or more purchases on the same card, at the same merchant, on the same day, where each purchase is at or under the card&#x27;s single-purchase limit but together they exceed it. Count each card, merchant and day group once.</pre></div></li>
   </ol>
-  <h4>Fix 2: example SQL queries, with a parameter and usage guidance</h4>
+  <div class="callout info"><strong>Want Genie to help?</strong> Click <strong>Generate with Genie</strong> first, keep the overview it writes, and paste the definitions below it. Genie writes a good description of the tables, but it can't know OSA's definitions or that the data stops on June 30, 2026.</div>
+
+  <h3>Step 2: example queries</h3>
   <p>Usage guidance tells Genie when to use an example. A parameter lets one example answer many versions of a question, and a question that matches a parameterized example gets a verified answer.</p>
   <ol class="steps" data-group="lab4b">
     <li><label><input type="checkbox" data-id="l4b"> In <strong>Configure</strong>, open the <strong>Examples</strong> tab and click <strong>Add</strong>. Enter the question and the SQL:</label>
@@ -337,18 +308,32 @@ WHERE (reconciled AND days_to_reconcile &gt; 30)
       <p class="q">The date to measure lateness from. The workshop data runs through 2026-06-30, so use that unless the user gives another date.</p></li>
     <li><label><input type="checkbox" data-id="l4b3"> Expand <strong>Usage Guidance</strong> and paste:</label>
       <p class="q">Use for questions about late, overdue or unreconciled statements. A statement is late if it was reconciled more than 30 days after the statement date, or is still unreconciled more than 30 days after it.</p></li>
-    <li><label><input type="checkbox" data-id="l4b4"> Click <strong>Preview</strong> to check it runs, then <strong>Save</strong>. Add the second example the same way:</label>
+    <li><label><input type="checkbox" data-id="l4b4"> Click <strong>Save</strong>. Add the second example the same way:</label>
       <p class="q">Which cards are dormant?</p>
-      <div class="codeblock"><pre data-tpl>SELECT COUNT(*) AS dormant_cards
+      <div class="codeblock"><pre data-tpl>SELECT c.card_id, c.cardholder_name, a.agency_name
 FROM `{{CATALOG}}`.`{{SCHEMA}}`.cardholders c
+JOIN `{{CATALOG}}`.`{{SCHEMA}}`.agencies a ON c.agency_code = a.agency_code
 WHERE c.card_status = &#x27;Active&#x27;
   AND NOT EXISTS (SELECT 1 FROM `{{CATALOG}}`.`{{SCHEMA}}`.transactions t
                   WHERE t.card_id = c.card_id AND t.transaction_date &gt; DATE&#x27;2026-04-01&#x27;)</pre></div>
       <p class="muted small">Usage guidance:</p>
-      <p class="q">Use for questions about dormant, inactive or unused cards. A dormant card is an Active card with no purchases from April 1 through June 30, 2026. Return a count unless the user asks for a list.</p></li>
+      <p class="q">Use for questions about dormant, inactive or unused cards. A dormant card is an Active card with no purchases from April 1 through June 30, 2026. List the cards; give a count only if the user asks how many.</p></li>
+
+    <li><label><input type="checkbox" data-id="l4b5"> Add a third example for split purchases, with usage guidance:</label>
+      <p class="q">How many split purchases were there in fiscal year 2026?</p>
+      <div class="codeblock"><pre data-tpl>SELECT COUNT(*) AS split_purchase_groups FROM (
+  SELECT t.card_id, t.merchant_name, t.transaction_date
+  FROM `{{CATALOG}}`.`{{SCHEMA}}`.transactions t
+  JOIN `{{CATALOG}}`.`{{SCHEMA}}`.cardholders c ON t.card_id = c.card_id
+  WHERE t.fiscal_year = 2026
+  GROUP BY t.card_id, t.merchant_name, t.transaction_date, c.single_purchase_limit
+  HAVING COUNT(*) &gt;= 2 AND MAX(t.amount) &lt;= c.single_purchase_limit AND SUM(t.amount) &gt; c.single_purchase_limit
+)</pre></div>
+      <p class="muted small">Usage guidance:</p>
+      <p class="q">Use for questions about split purchases: purchases broken up to stay under a card&#x27;s single-purchase limit. Count each card, merchant and day group once. Change the fiscal year filter to match the question, and default to fiscal year 2026.</p></li>
   </ol>
-  <h4>Fix 3: the answer key's metric view</h4>
-  <p class="muted small">Use this if Genie Code's version wouldn't run or is missing measures. It has the same name, so running it replaces Genie Code's view, and your agent keeps using it.</p>
+
+  <h3>Step 3: a metric view of your own</h3>
   <ol class="steps" data-group="lab4c">
     <li><label><input type="checkbox" data-id="l4c"> Open the <strong>SQL editor</strong> and run this. It creates your metric view in your own schema, over the shared tables, with official definitions and synonyms:</label>
       <div class="codeblock"><pre data-tpl>CREATE OR REPLACE VIEW `{{CATALOG}}`.`{{SANDBOX}}`.pcard_metrics_{{NAME}}
@@ -407,16 +392,20 @@ AS $$
       comment: &quot;Purchases made after the cardholder left state employment&quot;
       synonyms: [&#x27;spending after they left&#x27;, &#x27;terminated cardholder purchases&#x27;]
 $$</pre></div></li>
-    <li><label><input type="checkbox" data-id="l4d"> If you skipped step 2, add it to your agent: click <strong>Configure</strong>, then <strong>Data</strong>, then <strong>Add</strong>, and choose <code data-tpl>{{CATALOG}}.{{SANDBOX}}.pcard_metrics_{{NAME}}</code>.</label></li>
+    <li><label><input type="checkbox" data-id="l4d"> Back in your agent, click <strong>Configure</strong>, then <strong>Data</strong>, then <strong>Add</strong>, and choose <code data-tpl>{{CATALOG}}.{{SANDBOX}}.pcard_metrics_{{NAME}}</code>.</label></li>
   </ol>
-  <h4>Fix 4: a synonym inside the agent</h4>
+  <p class="muted small">You can also ask <strong>Genie Code</strong> to draft a metric view from your tables and benchmark results, then compare its measures with these.</p>
+
+  <h3>Step 4: a synonym inside the agent</h3>
   <ol class="steps" data-group="lab4d">
     <li><label><input type="checkbox" data-id="l4e"> In <strong>Configure</strong>, open <strong>Sources</strong>, click the <code>agencies</code> table, and click the <strong>pencil icon</strong> on <code>agency_name</code>. Add these synonyms and save:</label>
       <p class="q">department, dept, state agency</p></li>
   </ol>
-  <p class="muted small">Changes made here apply only to your agent. They don't change the column descriptions in Unity Catalog, so they're safe on shared tables.</p>
+  <p class="muted small">Changes made in the agent apply only to your agent. They don't change the column descriptions in Unity Catalog, so they're safe on shared tables.</p>
+
   <h3>Worth knowing</h3>
   <div class="cards two">
+    <div class="card"><h3>Proposed fixes</h3><p>Every evaluation run offers <strong>Review proposed fixes</strong>: knowledge snippets Genie builds from the failures, such as a filter for "places we don't allow". Accept the ones that match OSA's definitions.</p></div>
     <div class="card"><h3>Joins</h3><p>Under <strong>Configure</strong>, <strong>Examples</strong>, <strong>Add</strong>, <strong>Joins</strong>, you can define how tables connect and the relationship type. Genie already joins these tables correctly, because the key columns share names across tables, so you don't need it today.</p></div>
     <div class="card"><h3>Genie Code suggestions</h3><p>The suggestions you held back in section 2 are still available. Accept the ones you'd keep in production, and the re-run will tell you whether they helped.</p></div>
     <div class="card"><h3>Genie ontology</h3><p>The shared context layer behind Genie. It combines modeled knowledge, such as metric views and domains, with knowledge Genie learns over time, and treats curated agents as authoritative. Your metric view is part of that modeled knowledge.</p></div>
@@ -426,43 +415,58 @@ $$</pre></div></li>
 
 <!-- ============================================================ LAB 5 -->
 <section id="lab5" class="lab">
-  <h2><span class="bullet b-purple">5</span> Re-run, compare, next steps</h2>
-  <p class="goal"><strong>Goal:</strong> prove the fixes worked, see what Workbench adds, and leave with a production routine. <span class="time">12:45 · 15 min</span></p>
+  <h2><span class="bullet b-purple">5</span> Re-run and keep it as code</h2>
+  <p class="goal"><strong>Goal:</strong> prove the curation worked, then save it so it can be versioned and promoted. <span class="time">12:45 · 15 min</span></p>
+  <h3>Re-run the benchmark</h3>
   <ol class="steps" data-group="lab5">
     <li><label><input type="checkbox" data-id="l5a"> Click <strong>Benchmark</strong> at the top of the page, then <strong>Run all benchmarks</strong> again. Keep the same <strong>Mode</strong> as your baseline run, so the comparison is fair.</label></li>
-    <li><label><input type="checkbox" data-id="l5b"> In the <strong>Evaluations</strong> tab, compare the new run's accuracy with your baseline. When we tried these same fixes, the agent went from about 3 to 9 or 10 correct out of 10.</label></li>
-    <li><label><input type="checkbox" data-id="l5c"> For any question still failing, decide: is the agent wrong, or is the benchmark too strict? Either is a legitimate fix.</label></li>
+    <li><label><input type="checkbox" data-id="l5b"> In the <strong>Evaluations</strong> tab, compare the new run's accuracy with your baseline. Aim for 9 or 10 out of 10.</label></li>
+    <li><label><input type="checkbox" data-id="l5c"> For any question still failing, open it and read the <strong>Score reason</strong>. If Genie's answer is right and the reference is too strict, such as a missing column the question didn't need, click <strong>Update ground truth</strong>. If Genie is wrong, find the layer that fixes it and run again.</label></li>
   </ol>
+
+  <h3>Keep the curated agent as a bundle</h3>
+  <p>Once the score is where you want it, capture the agent as code with a <strong>Declarative Automation Bundle</strong>. The bundle holds everything you just built: the tables, instructions, example queries, synonyms and all 10 benchmark questions. From there you can review changes in Git, deploy the same agent to another workspace, and rebuild it if someone breaks it in the UI.</p>
+  <ol class="steps" data-group="lab5b">
+    <li><label><input type="checkbox" data-id="l5d"> Open a terminal with the <strong>Databricks CLI</strong> (version 1.3.0 or later) signed in to the OSA workspace. Create a folder for the bundle and download the starter configuration:</label>
+      <div class="codeblock"><pre>mkdir osa-pcard-genie &amp;&amp; cd osa-pcard-genie
+curl -O https://amirlyall.github.io/osa-genie-tech-workshop/bundle/databricks.yml</pre></div></li>
+    <li><label><input type="checkbox" data-id="l5e"> Pull your agent into the bundle:</label>
+      <div class="codeblock"><pre data-tpl>databricks bundle generate genie-space --existing-id {{AGENT_ID}} --key pcard_review</pre></div>
+      <p class="muted small">This writes <code>resources/pcard_review.genie_space.yml</code> (title, warehouse, folder) and <code>src/pcard_review.geniespace.json</code> (the full curated agent). Open the JSON: that's your curation, in a form you can commit and review.</p></li>
+    <li><label><input type="checkbox" data-id="l5f"> Check it, then deploy a production copy. The <code>prod</code> target in the starter file names it <strong>P-Card Review (Production)</strong>:</label>
+      <div class="codeblock"><pre>databricks bundle validate
+databricks bundle deploy -t prod</pre></div></li>
+    <li><label><input type="checkbox" data-id="l5g"> Open <strong>P-Card Review (Production)</strong>, click <strong>Benchmark</strong>, and run the benchmarks. The questions came with it, so you can confirm the copy scores the same.</label></li>
+  </ol>
+  <h4>Making changes from here on</h4>
+  <p>Edit your own agent in the UI, re-run its benchmarks, then pull the changes into the bundle, review them, and redeploy:</p>
+  <div class="codeblock"><pre>databricks bundle generate genie-space --resource pcard_review --force
+git diff
+databricks bundle deploy -t prod</pre></div>
+  <div class="callout info"><strong>Before sharing the production copy,</strong> uncomment the <code>permissions</code> block in <code>databricks.yml</code> and set the auditors' group, so access is part of the code too. The agent's tables are named in full in the JSON, so promoting to another catalog means updating those names.</div>
+
   <h3>Genie Workbench</h3>
-  <p>Workbench is a Databricks App your workspace administrators deploy. It gives an agent an instant quality score, then runs <strong>Auto-Optimize</strong>: a background job that tries changes against your benchmarks and keeps the ones that raise the score.
-  That takes longer than this session, so the instructor started a run at 12:00. We'll walk through it together:</p>
-  <ul>
-    <li><strong>The IQ scan:</strong> a rule-based quality score with specific recommendations. It runs in seconds, so try it on your own agent if Workbench is available.</li>
-    <li><strong>The Auto-Optimize results:</strong> what it changed, and how the benchmark score moved.</li>
-  </ul>
-  <h3>Running it in production</h3>
-  <div class="checklist" data-group="prod">
-    <label><input type="checkbox" data-id="p1"> Name an owner for every shared agent.</label>
-    <label><input type="checkbox" data-id="p2"> Keep 20 to 50 benchmark questions per agent, drawn from what users really ask, including more than one phrasing of each.</label>
-    <label><input type="checkbox" data-id="p3"> Re-run benchmarks after every change to instructions, examples or data, and before sharing more widely.</label>
-    <label><input type="checkbox" data-id="p4"> Review <strong>Monitor</strong> weekly. Every Fix it or Request review is a candidate benchmark question.</label>
-    <label><input type="checkbox" data-id="p5"> Collect real questions from business users, and turn the ones Genie gets wrong into benchmark questions.</label>
-    <label><input type="checkbox" data-id="p6"> Move definitions that more than one agent needs into a shared metric view, instead of repeating them in instructions.</label>
-  </div>
+  <p>Genie Workbench is a Databricks App that does much of this automatically. It gives an agent a quick quality score with recommendations, and its <strong>Auto-Optimize</strong> job tries changes against your benchmarks and keeps the ones that raise the score. The job runs in the background, so it suits overnight tuning rather than a live session.</p>
 </section>
 
 <!-- ============================================================ HOMEWORK -->
 <section id="homework">
-  <h2>After the session: optimized vs. not</h2>
-  <p>A short exercise for your Databricks workspace administrators, or anyone with access to Genie Workbench, to run this week.</p>
+  <h2>After the session</h2>
+  <h3>Running it in production</h3>
+  <div class="checklist" data-group="prod">
+    <label><input type="checkbox" data-id="p1"> Name an owner for every shared agent.</label>
+    <label><input type="checkbox" data-id="p2"> Keep 20 to 50 benchmark questions per agent, drawn from what users really ask, including more than one phrasing of each.</label>
+    <label><input type="checkbox" data-id="p3"> Re-run benchmarks after every change to instructions, examples or data, and before deploying the bundle.</label>
+    <label><input type="checkbox" data-id="p4"> Review <strong>Monitor</strong> weekly. Every Fix it or Request review is a candidate benchmark question.</label>
+    <label><input type="checkbox" data-id="p5"> Collect real questions from business users, and turn the ones Genie gets wrong into benchmark questions.</label>
+    <label><input type="checkbox" data-id="p6"> Move definitions that more than one agent needs into a shared metric view, instead of repeating them in instructions.</label>
+  </div>
+  <h3>Hand-tuned vs. Auto-Optimize</h3>
   <ol class="steps" data-group="hw">
-    <li><label><input type="checkbox" data-id="h1"> Make two identical bare agents from the six tables, and load the same 10 benchmark questions into both.</label></li>
-    <li><label><input type="checkbox" data-id="h2"> Run the benchmarks on both and record the baselines.</label></li>
-    <li><label><input type="checkbox" data-id="h3"> Leave agent A alone. Point Genie Workbench Auto-Optimize at agent B and let it run.</label></li>
-    <li><label><input type="checkbox" data-id="h4"> Re-run the benchmarks on both. Compare the scores, and look at what Auto-Optimize changed in agent B.</label></li>
-    <li><label><input type="checkbox" data-id="h5"> Compare agent B with the agent you fixed by hand today. Which changes match? Which would you keep?</label></li>
+    <li><label><input type="checkbox" data-id="h1"> Make a bare agent from the six tables and load the same 10 benchmark questions.</label></li>
+    <li><label><input type="checkbox" data-id="h2"> Point Genie Workbench Auto-Optimize at it and let it run.</label></li>
+    <li><label><input type="checkbox" data-id="h3"> Re-run the benchmarks, and compare the score and the changes it made with the agent you curated by hand today.</label></li>
   </ol>
-  <p class="muted small">Share the scores with the group. It's the quickest way to decide how much tuning to do by hand and how much to hand to Auto-Optimize.</p>
 </section>
 
 <!-- ============================================================ CHEAT SHEET -->
@@ -494,13 +498,13 @@ $$</pre></div></li>
   <details class="faq"><summary>Creating the metric view fails</summary><p>You need permission to create views in the schema you chose, and Select on the workshop tables. Check the schema name in your settings, or ask your Databricks workspace administrators which schema to use.</p></details>
   <details class="faq"><summary>My score went down after a change</summary><p>That's what benchmarks are for. Open the questions that changed, and check whether an instruction is contradicting an example query or the metric view. Remove one change at a time and re-run.</p></details>
   <details class="faq"><summary>Benchmark details disappeared</summary><p>Evaluation details are kept for about a week. Record your scores if you want to compare later.</p></details>
-  <details class="faq"><summary>Where do I find Genie Workbench?</summary><p>It's a Databricks App, so look under <strong>Apps</strong> in the workspace. If it isn't there, your Databricks workspace administrators haven't deployed it yet. See the <a href="setup.html">setup page</a>.</p></details>
+  <details class="faq"><summary>Where do I find Genie Workbench?</summary><p>It's a Databricks App, so look under <strong>Apps</strong> in the workspace. If it isn't there, ask your Databricks workspace administrators.</p></details>
 </section>
 
-<footer><img src="databricks-logo.svg" alt="Databricks"><span>NC Office of the State Auditor · Genie Workshop for Technical Users · Tue, Nov 17, 2026 · <a href="setup.html">Setup for Databricks workspace administrators</a> · <a href="facilitator.html">Facilitator guide</a> · <a href="https://amirlyall.github.io/osa-genie-workshop/">Business-user guide</a> · Synthetic data for training purposes only.</span></footer>
+<footer><img src="databricks-logo.svg" alt="Databricks"><span>NC Office of the State Auditor · Genie Workshop for Technical Users · Tue, Nov 17, 2026 · <a href="https://amirlyall.github.io/osa-genie-workshop/">Business-user guide</a> · Synthetic data for training purposes only.</span></footer>
 </main>
 </div>
 
-<script src="app.js?v=4"></script>
+<script src="app.js?v=5"></script>
 </body>
 </html>
