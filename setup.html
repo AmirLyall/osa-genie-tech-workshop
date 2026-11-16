@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Setup for Databricks workspace administrators · NC OSA Genie Workshop for Technical Users</title>
+<link rel="icon" href="databricks-logo.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=1">
+</head>
+<body class="subpage">
+<header class="topbar">
+  <a class="brand" href="./" style="text-decoration:none"><img src="databricks-logo.svg" alt="Databricks"><span class="divider"></span><span class="title">NC OSA · Genie Workshop</span><span class="pill">Administrator setup</span></a>
+  <div class="top-actions"><a class="btn ghost sm" href="./">Open the workshop guide</a><button class="btn ghost sm" type="button" onclick="window.print()">Print / PDF</button></div>
+</header>
+<main class="single">
+<p class="eyebrow">Before Tue, Nov 17, 2026</p>
+<section id="setup">
+  <h2>Setup for OSA's Databricks workspace administrators</h2>
+  <p>Attendees each build their own Genie Agent on the same P-card tables as last week's business-user session, then create one metric view of their own. Before the session, make sure of four things.</p>
+
+  <h3>1. The workshop tables</h3>
+  <p>If the <code>osa_pcard_review</code> schema is still there from last week, there's nothing to do. Otherwise, run
+  <a href="osa_genie_workshop_setup.py" download><code>osa_genie_workshop_setup.py</code></a> once (import it, set <code>catalog</code>, Run all on serverless). It creates the six tables with descriptions.</p>
+
+  <h3>2. Access for the attendees' group</h3>
+  <ul>
+    <li><code>USE CATALOG</code> on the catalog, and <code>USE SCHEMA</code> and <code>SELECT</code> on <code>osa_pcard_review</code>.</li>
+    <li>The <strong>Databricks SQL</strong> entitlement, so they can create Genie Agents.</li>
+    <li><strong>Can use</strong> on a pro or serverless SQL warehouse.</li>
+    <li>A schema each person can create a view in, such as their ad-hoc schema, for their metric view (<code>USE SCHEMA</code> and <code>CREATE TABLE</code> on it).</li>
+    <li>Permission to run a notebook on serverless compute, for the optional benchmark loader.</li>
+  </ul>
+
+  <h3>3. Genie Workbench</h3>
+  <p><a href="https://github.com/databricks-solutions/databricks-genie-workbench" target="_blank" rel="noopener">Genie Workbench</a> is a Databricks App. Install it with its notebook installer:</p>
+  <ol>
+    <li>Clone the repo into a Databricks Git folder and open <code>notebooks/install.py</code>.</li>
+    <li>Attach serverless compute (environment v5) and set the widgets: <code>app_name</code>, <code>catalog</code>, <code>warehouse_id</code>, and <code>lakebase_mode</code> (<code>create</code>, <code>existing</code> or <code>skip</code>).</li>
+    <li>Run the notebook from the top. It creates the app, a schema for the optimizer, and a job that runs Auto-Optimize.</li>
+    <li>Give the attendees' group <strong>Can use</strong> on the app.</li>
+  </ol>
+  <div class="callout tip"><strong>Prerequisites:</strong> Databricks Apps enabled, Unity AI Gateway available in the workspace's region, a SQL warehouse, and permission to create a schema. Installing usually needs workspace-admin-level rights. Lakebase is optional, but without it scan history and sessions are kept in memory only.</div>
+
+  <h3>4. A quick check</h3>
+  <p>Sign in as an attendee-like account, create an agent from the six tables, and run <a href="load_benchmarks.py" download><code>load_benchmarks.py</code></a> against it. Then open Genie Workbench and run an IQ scan on that agent.</p>
+  <div class="callout info"><strong>All data is synthetic.</strong> Agencies, cardholders, merchants and dollar amounts are all made up for training. Nothing here is an OSA finding.</div>
+</section>
+<footer><img src="databricks-logo.svg" alt="Databricks"><span><a href="./">Workshop guide</a> · <a href="setup.html">Setup</a> · <a href="facilitator.html">Facilitator guide</a></span></footer>
+</main>
+</body>
+</html>
