@@ -2,25 +2,32 @@
 # MAGIC %md
 # MAGIC # NC OSA Genie Workshop (technical): load the benchmark questions
 # MAGIC
-# MAGIC Adds the workshop's 10 worst-practice benchmark questions, each with a reference SQL answer, to **your own** Genie Agent.
+# MAGIC Adds the workshop's 10 poorly worded benchmark questions, each with a reference SQL answer, to **your own** Genie Agent.
 # MAGIC
-# MAGIC **How to run:** paste your agent's URL or ID into `agent`, check `catalog` and `schema` point at the workshop tables, then **Run all**.
+# MAGIC **How to run:** fill in the boxes at the top of the notebook: your agent's URL in **Agent URL or ID** and the catalog of the workshop tables in **Catalog**. Leave **Schema** as `osa_pcard_review` unless your tables are elsewhere, then **Run all**.
 # MAGIC It takes a few seconds. Re-running is safe: questions already in the agent are skipped, and nothing else in the agent changes.
 # MAGIC
 # MAGIC You need **Can Manage** or **Can Edit** on the agent. You get Can Manage automatically on agents you create.
 
 # COMMAND ----------
 
-dbutils.widgets.text("agent", "", "Your agent URL or ID (required)")
-dbutils.widgets.text("catalog", "", "Catalog of the workshop tables (required)")
-dbutils.widgets.text("schema", "osa_pcard_review", "Schema of the workshop tables")
+# Fill in the boxes at the top of the notebook, or paste your values between the quotes here.
+# A value in a box wins; these are used when a box is empty.
+DEFAULT_AGENT = ""    # your agent's URL or ID
+DEFAULT_CATALOG = ""  # catalog that holds the workshop tables
+
+# Argument order is name, default value, label.
+dbutils.widgets.text("agent", DEFAULT_AGENT, "Agent URL or ID")
+dbutils.widgets.text("catalog", DEFAULT_CATALOG, "Catalog")
+dbutils.widgets.text("schema", "osa_pcard_review", "Schema")
 
 import re
-AGENT = dbutils.widgets.get("agent").strip()
-CATALOG = dbutils.widgets.get("catalog").strip()
+# Fall back to the defaults, because a box that already exists keeps its old value when the cell is edited and re-run.
+AGENT = dbutils.widgets.get("agent").strip() or DEFAULT_AGENT.strip()
+CATALOG = dbutils.widgets.get("catalog").strip() or DEFAULT_CATALOG.strip()
 SCHEMA = dbutils.widgets.get("schema").strip() or "osa_pcard_review"
 if not AGENT or not CATALOG:
-    raise ValueError("Fill in the 'agent' and 'catalog' widgets, then Run all again.")
+    raise ValueError("Fill in the 'Agent URL or ID' and 'Catalog' boxes at the top of the notebook (or DEFAULT_AGENT and DEFAULT_CATALOG in this cell), then Run all again.")
 # Accept a full URL such as .../genie/rooms/<id>?o=123 or just the ID.
 match = re.search(r"([0-9a-f]{32})", AGENT)
 if not match:

@@ -28,7 +28,7 @@
   <p class="eyebrow">Tue, Nov 17, 2026 · 12:00 to 1:00 PM ET · NC Office of the State Auditor, Raleigh and virtual</p>
   <h1>Measure it. Fix it.<br>Measure again.</h1>
   <p class="lead">A hands-on hour for OSA's technical team on making a Genie Agent reliable. You'll build an agent from a set of P-card tables,
-  score it with a set of <strong>worst-practice questions</strong> written the way people really ask, fix what fails at the right layer, and <strong>re-run the benchmark</strong> to prove the fixes worked.</p>
+  score it with a set of <strong>poorly worded questions</strong> written the way people really ask, fix what fails at the right layer, and <strong>re-run the benchmark</strong> to prove the fixes worked.</p>
   <div class="cards three">
     <div class="card domain fin"><h3>Benchmarks</h3><p>Questions with known right answers, so "it seems better" becomes a score you can track after every change.</p></div>
     <div class="card domain perf"><h3>Improvement layers</h3><p>Instructions, example queries, metric views and agent-level metadata. Each fixes a different kind of failure.</p></div>
@@ -100,10 +100,10 @@
 <section id="lab1" class="lab">
   <h2><span class="bullet b-red">1</span> Kickoff</h2>
   <p class="goal"><strong>Goal:</strong> agree on what "good" means and how we'll measure it. <span class="time">12:00 · 10 min</span></p>
-  <p>Users rarely ask the way a query is written. They use vague dates, shorthand only OSA would understand, and terms nobody has defined. Today's benchmark questions are written that way on purpose: worst practices.
+  <p>Users rarely ask the way a query is written. They use vague dates, shorthand only OSA would understand, and terms nobody has defined. Today's benchmark questions are poorly worded on purpose.
   A well-tuned agent should still get them right, and you'll treat each miss the way you'd treat a failing test.</p>
   <table class="toolbox pair">
-    <thead><tr><th>Worst practice: how people ask</th><th>Best practice: what they mean</th></tr></thead>
+    <thead><tr><th>Poorly worded: how people ask</th><th>Well worded: what they mean</th></tr></thead>
     <tbody>
       <tr><td>Find fraud.</td><td>Transactions made after the cardholder's termination date in fiscal year 2026.</td></tr>
       <tr><td>Who are our big spenders?</td><td>The top 10 cardholders by total spend in fiscal year 2026.</td></tr>
@@ -130,7 +130,7 @@
   <h3>Today's flow</h3>
   <ol>
     <li>Create a bare agent from the six tables.</li>
-    <li>Load 10 worst-practice benchmark questions, each with a reference SQL answer.</li>
+    <li>Load 10 poorly worded benchmark questions, each with a reference SQL answer.</li>
     <li>Run the benchmark and record your baseline score.</li>
     <li>Fix the failures, choosing the lowest layer that works.</li>
     <li>Re-run the benchmark and compare.</li>
@@ -161,9 +161,9 @@
     <div class="tab-panel active" id="load-nb">
       <ol class="steps" data-group="lab2nb">
         <li><label><input type="checkbox" data-id="l2e"> Download <a href="load_benchmarks.py" download><code>load_benchmarks.py</code></a> and import it into your workspace folder (<strong>Workspace</strong>, then <strong>Import</strong>).</label></li>
-        <li><label><input type="checkbox" data-id="l2f"> Fill in the widgets, copying from below. Leave <code>schema</code> as <code>osa_pcard_review</code>.</label>
+        <li><label><input type="checkbox" data-id="l2f"> Fill in the boxes at the top of the notebook, copying from below. Type into the boxes rather than editing the code. Leave <strong>Schema</strong> as <code>osa_pcard_review</code>.</label>
           <p class="q"><span data-tpl>{{AGENT}}</span></p>
-          <p class="muted small">That's <code>agent</code>. And this is <code>catalog</code>:</p>
+          <p class="muted small">That goes in <strong>Agent URL or ID</strong>. This goes in <strong>Catalog</strong>:</p>
           <p class="q"><span data-tpl>{{CATALOG}}</span></p></li>
         <li><label><input type="checkbox" data-id="l2g"> Connect to <strong>Serverless</strong> and click <strong>Run all</strong>. It prints "Added 10 benchmark question(s)". Re-running is safe and never creates duplicates.</label></li>
       </ol>
