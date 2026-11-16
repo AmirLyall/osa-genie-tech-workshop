@@ -266,11 +266,14 @@ WHERE m.is_blocked AND t.fiscal_year = 2026</pre></div></div>
     <li><label><input type="checkbox" data-id="l4r1"> In your evaluation run, click <strong>Review proposed fixes</strong>. Genie turns the failures into knowledge snippets, such as a definition of "places we don't allow" or the join between purchases and merchant categories.</label></li>
     <li><label><input type="checkbox" data-id="l4r2"> Read each snippet before accepting it. Does it match OSA's definition? For example, is the suggested "late statements" filter the same as card policy? Accept the ones that are right, reject the rest, and click <strong>Accept</strong>.</label></li>
   </ol>
-  <h3>Step 2: ask Genie Code for the bigger picture</h3>
+  <h3>Step 2: have Genie Code build a metric view</h3>
   <ol class="steps" data-group="lab4g">
     <li><label><input type="checkbox" data-id="l4g1"> Open <strong>Genie Code</strong> in your agent and paste:</label>
-      <p class="q">Review this agent's tables, column descriptions and benchmark results. Suggest the business terms that need a glossary definition, the metrics that should live in a metric view instead of text instructions, and any joins that should be defined. Then draft the metric view YAML.</p></li>
-    <li><label><input type="checkbox" data-id="l4g2"> Compare its suggestions with the answer key below. Which terms did it find? Did it put each one at the lowest layer that works?</label></li>
+      <p class="q"><span data-tpl>Review this agent's tables, column descriptions and benchmark results. Suggest the business terms that need a glossary definition, the metrics that should live in a metric view instead of text instructions, and any joins that should be defined. Then write a complete CREATE OR REPLACE VIEW ... WITH METRICS LANGUAGE YAML statement for a metric view named {{CATALOG}}.{{SANDBOX}}.pcard_metrics_{{NAME}} over the transactions table, with joins to the other tables, and a comment and synonyms on every dimension and measure.</span></p></li>
+    <li><label><input type="checkbox" data-id="l4g2"> Read the draft before running it. Do the measures match OSA's definitions, such as receipt compliance as a percentage? Ask Genie Code to fix anything that's off.</label></li>
+    <li><label><input type="checkbox" data-id="l4g3"> Copy the statement into the <strong>SQL editor</strong> and run it. If it fails, paste the error back into Genie Code and ask for a fix.</label></li>
+    <li><label><input type="checkbox" data-id="l4g4"> Add it to your agent: click <strong>Configure</strong>, then <strong>Data</strong>, then <strong>Add</strong>, and choose <code data-tpl>{{CATALOG}}.{{SANDBOX}}.pcard_metrics_{{NAME}}</code>.</label></li>
+    <li><label><input type="checkbox" data-id="l4g5"> Compare Genie Code's glossary and measures with the answer key below. Which terms did it find? Did it put each one at the lowest layer that works?</label></li>
   </ol>
   <h3>Step 3: fill the gaps from the answer key</h3>
   <p>The fixes below are the answer key for this benchmark. Use them for anything the proposed fixes and Genie Code didn't cover, or apply them all if you're short on time.</p>
@@ -313,7 +316,8 @@ WHERE c.card_status = &#x27;Active&#x27;
   AND NOT EXISTS (SELECT 1 FROM `{{CATALOG}}`.`{{SCHEMA}}`.transactions t
                   WHERE t.card_id = c.card_id AND t.transaction_date &gt; DATE&#x27;2026-04-01&#x27;)</pre></div></li>
   </ol>
-  <h4>Fix 3: a metric view of your own</h4>
+  <h4>Fix 3: the answer key's metric view</h4>
+  <p class="muted small">Use this if Genie Code's version wouldn't run or is missing measures. It has the same name, so running it replaces Genie Code's view, and your agent keeps using it.</p>
   <ol class="steps" data-group="lab4c">
     <li><label><input type="checkbox" data-id="l4c"> Open the <strong>SQL editor</strong> and run this. It creates your metric view in your own schema, over the shared tables, with official definitions and synonyms:</label>
       <div class="codeblock"><pre data-tpl>CREATE OR REPLACE VIEW `{{CATALOG}}`.`{{SANDBOX}}`.pcard_metrics_{{NAME}}
@@ -372,7 +376,7 @@ AS $$
       comment: &quot;Purchases made after the cardholder left state employment&quot;
       synonyms: [&#x27;spending after they left&#x27;, &#x27;terminated cardholder purchases&#x27;]
 $$</pre></div></li>
-    <li><label><input type="checkbox" data-id="l4d"> Back in your agent, click <strong>Configure</strong>, then <strong>Data</strong>, then <strong>Add</strong>, and add <code data-tpl>{{CATALOG}}.{{SANDBOX}}.pcard_metrics_{{NAME}}</code>.</label></li>
+    <li><label><input type="checkbox" data-id="l4d"> If you skipped step 2, add it to your agent: click <strong>Configure</strong>, then <strong>Data</strong>, then <strong>Add</strong>, and choose <code data-tpl>{{CATALOG}}.{{SANDBOX}}.pcard_metrics_{{NAME}}</code>.</label></li>
   </ol>
   <h4>Fix 4: a synonym inside the agent</h4>
   <ol class="steps" data-group="lab4d">
