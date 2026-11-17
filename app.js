@@ -44,20 +44,8 @@
   // Copy reads the text at click time, so it picks up the settings above.
   $$("p.q").forEach((q) => { const span = $("[data-tpl]", q); const t = q.textContent.trim(); q.appendChild(copyBtn(() => (span ? span.textContent : t).trim())); });
   $$(".codeblock").forEach((box) => { const pre = $("pre", box); box.appendChild(copyBtn(() => pre.textContent)); });
-  // Rich blocks copy as HTML too, so headings and bold labels survive the paste into a rich-text editor.
-  $$(".rich-copy").forEach((box) => {
-    const html = box.innerHTML, text = box.innerText;
-    const b = copyBtn(() => text);
-    b.addEventListener("click", async (e) => {
-      e.stopImmediatePropagation(); e.preventDefault();
-      try {
-        await navigator.clipboard.write([new ClipboardItem({ "text/html": new Blob([html], { type: "text/html" }), "text/plain": new Blob([text], { type: "text/plain" }) })]);
-      } catch (err) { await navigator.clipboard.writeText(text).catch(() => {}); }
-      b.textContent = "Copied"; b.classList.add("done");
-      setTimeout(() => { b.textContent = "Copy"; b.classList.remove("done"); }, 1400);
-    }, true);
-    box.prepend(b);
-  });
+  // Rich blocks preview the formatting here, but copy Markdown, which the Page editor turns into headings and bold on paste.
+  $$(".rich-copy").forEach((box) => { const md = box.dataset.md || box.innerText; box.prepend(copyBtn(() => md)); });
 
   /* ---------- tabs ---------- */
   $$(".tabs").forEach((tabs) => {

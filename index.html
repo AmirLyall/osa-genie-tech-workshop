@@ -378,8 +378,152 @@ WHERE c.card_status = &#x27;Active&#x27;
       <p class="muted small">Name</p><p class="q"><span data-tpl>P-Card Review Data Dictionary ({{NAME}})</span></p>
       <p class="muted small">Synonyms</p><p class="q">p-card glossary, p-card data dictionary, purchasing card terms</p>
       <p class="muted small">Description</p><p class="q">Business terms used in P-card review, with their synonyms and the tables and columns where each one lives.</p>
-      <p class="muted small">Page body: copy this and paste it into the Page body. The headings and bold labels paste as formatting.</p>
-      <div class="rich-copy"><h1>P-Card Review data dictionary</h1>
+      <p class="muted small">Page body: copy this and paste it into the Page body. It copies as Markdown, so the headings and bold labels format as you paste.</p>
+      <div class="rich-copy" data-md="# P-Card Review data dictionary
+
+## Fiscal year (FY)
+
+**Definition:** The North Carolina state fiscal year, July 1 through June 30, named for the year it ends. For example, FY2026 runs July 1, 2025 through June 30, 2026.
+
+**Synonyms:** FY, fiscal year, state fiscal year
+
+**Related data:** `transactions.fiscal_year`, `monthly_statements.fiscal_year`, `agency_budgets.fiscal_year`
+
+## Fiscal quarter
+
+**Definition:** A three-month part of the fiscal year: Q1 is July to September, Q2 October to December, Q3 January to March, Q4 April to June.
+
+**Synonyms:** quarter
+
+**Related data:** `transactions.fiscal_quarter`
+
+## Agency
+
+**Definition:** A state agency that participates in the P-card program.
+
+**Synonyms:** department, dept, state agency
+
+**Related data:** `agencies.agency_code`, `agencies.agency_name`
+
+## Cardholder
+
+**Definition:** The state employee a purchasing card is issued to. Several cardholders can share a name, so each card is identified by its card ID.
+
+**Synonyms:** card owner, employee
+
+**Related data:** `cardholders.card_id`, `cardholders.cardholder_name`
+
+## Single-purchase limit
+
+**Definition:** The most a cardholder may spend in one purchase on their card.
+
+**Synonyms:** transaction limit, per-purchase limit
+
+**Related data:** `cardholders.single_purchase_limit`
+
+## Monthly limit
+
+**Definition:** The most a cardholder may spend on their card in a calendar month.
+
+**Synonyms:** monthly cap, credit limit
+
+**Related data:** `cardholders.monthly_limit`
+
+## Merchant category code (MCC)
+
+**Definition:** A four-digit code that classifies the type of business a purchase was made at.
+
+**Synonyms:** MCC, merchant category
+
+**Related data:** `transactions.mcc`, `merchant_categories.mcc`
+
+## Blocked merchant category
+
+**Definition:** A merchant category that card policy prohibits, such as bars, liquor stores, gambling or cash withdrawals.
+
+**Synonyms:** prohibited merchant, not allowed, places we don&#x27;t allow
+
+**Related data:** `merchant_categories.is_blocked`
+
+## Split purchase
+
+**Definition:** Two or more purchases on the same card, at the same merchant, on the same day, where each is within the card&#x27;s single-purchase limit but together they exceed it. Each card, merchant and day group counts as one split purchase.
+
+**Synonyms:** split transaction, purchase splitting, split charge
+
+**Related data:** `transactions`, `cardholders.single_purchase_limit`
+
+## Termination date
+
+**Definition:** The date a cardholder left state employment.
+
+**Synonyms:** separation date, end date, left
+
+**Related data:** `cardholders.termination_date`, `cardholders.employee_status`
+
+## Purchase after termination
+
+**Definition:** A purchase made on a card after its cardholder&#x27;s termination date.
+
+**Synonyms:** post-termination spending, spending after they left
+
+**Related data:** `transactions.transaction_date`, `cardholders.termination_date`
+
+## Receipt compliance rate
+
+**Definition:** The percentage of purchases with an itemized receipt attached.
+
+**Synonyms:** receipt rate, receipt compliance
+
+**Related data:** `transactions.receipt_attached`
+
+## Bad receipt compliance
+
+**Definition:** A receipt compliance rate below 90% for a fiscal year.
+
+**Synonyms:** poor receipt compliance, low receipt rate
+
+**Related data:** `transactions.receipt_attached`
+
+## Dormant card
+
+**Definition:** An active card with no purchases in the most recent 90 days.
+
+**Synonyms:** inactive card, unused card
+
+**Related data:** `cardholders.card_status`, `transactions.transaction_date`
+
+## Statement reconciliation
+
+**Definition:** The monthly review in which a cardholder matches their statement to receipts and their approver signs off.
+
+**Synonyms:** reconciliation, statement review
+
+**Related data:** `monthly_statements.reconciled`, `monthly_statements.reconciled_date`, `monthly_statements.days_to_reconcile`
+
+## Late statement
+
+**Definition:** A monthly statement reconciled more than 30 days after the statement date, or still unreconciled more than 30 days after it.
+
+**Synonyms:** overdue statement, late reconciliation
+
+**Related data:** `monthly_statements.days_to_reconcile`, `monthly_statements.statement_date`
+
+## Big spenders
+
+**Definition:** The cardholders with the highest total spend in a period, usually the top 10.
+
+**Synonyms:** top spenders, highest spenders
+
+**Related data:** `transactions.amount`, `cardholders.card_id`
+
+## Budget utilization
+
+**Definition:** An agency&#x27;s P-card spend for a fiscal year divided by its P-card budget for that year.
+
+**Synonyms:** budget used, spend against budget
+
+**Related data:** `transactions.amount`, `agency_budgets.pcard_budget`"><h1>P-Card Review data dictionary</h1>
 <h2>Fiscal year (FY)</h2>
 <p><strong>Definition:</strong> The North Carolina state fiscal year, July 1 through June 30, named for the year it ends. For example, FY2026 runs July 1, 2025 through June 30, 2026.</p>
 <p><strong>Synonyms:</strong> FY, fiscal year, state fiscal year</p>
@@ -586,6 +730,6 @@ databricks bundle generate genie-space --existing-id {{AGENT_ID}} --key pcard_re
 </main>
 </div>
 
-<script src="app.js?v=6"></script>
+<script src="app.js?v=7"></script>
 </body>
 </html>
