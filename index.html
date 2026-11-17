@@ -253,7 +253,7 @@ WHERE m.is_blocked AND t.fiscal_year = 2026</pre></div></div>
     <li><label><input type="checkbox" data-id="l3c"> Click two or three of the failed questions. Each one shows a <strong>Score reason</strong>, such as Extra Rows or Aggregation Issue, and a <strong>Judge analysis</strong> that explains how Genie's query differs from the reference. Turn on <strong>Show diff view</strong> to compare the SQL side by side.</label></li>
     <li><label><input type="checkbox" data-id="l3d"> For each failure, decide what kind of miss it is: a missing definition, the wrong time period, a clarifying question, or the right numbers in a different shape. That tells you which layer will fix it.</label></li>
   </ol>
-  <div class="callout tip"><strong>Expect a low score.</strong> In our test, a bare agent scored 1 out of 10 on the Benchmark page. It asked what "big spenders" meant, counted every year when no period was given, and listed blocked purchases instead of totaling them.</div>
+  <div class="callout tip"><strong>Expect a low score.</strong> A bare agent only knows the tables. Typical misses: asking what "big spenders" means, counting every year when no period is given, and listing blocked purchases instead of totaling them.</div>
   <div class="callout info"><strong>Not every miss is wrong.</strong> Sometimes Genie returns the right numbers with extra columns. Treat those as formatting, not logic, and decide whether the benchmark or the agent should change.</div>
 </section>
 
@@ -425,7 +425,7 @@ $$</pre></div></li>
   <h3>Re-run the benchmark</h3>
   <ol class="steps" data-group="lab5">
     <li><label><input type="checkbox" data-id="l5a"> Click <strong>Benchmark</strong> at the top of the page, then <strong>Run all benchmarks</strong> again. Keep the same <strong>Mode</strong> as your baseline run, so the comparison is fair.</label></li>
-    <li><label><input type="checkbox" data-id="l5b"> In the <strong>Evaluations</strong> tab, compare the new run's accuracy with your baseline. Aim for 9 or 10 out of 10.</label></li>
+    <li><label><input type="checkbox" data-id="l5b"> In the <strong>Evaluations</strong> tab, compare the new run's accuracy with your baseline. Note which questions moved, and which fix moved them.</label></li>
     <li><label><input type="checkbox" data-id="l5c"> For any question still failing, open it and read the <strong>Score reason</strong>. If Genie's answer is right and the reference is too strict, such as a missing column the question didn't need, click <strong>Update ground truth</strong>. If Genie is wrong, find the layer that fixes it and run again.</label></li>
   </ol>
 
