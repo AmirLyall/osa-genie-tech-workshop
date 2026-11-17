@@ -261,7 +261,7 @@ WHERE m.is_blocked AND t.fiscal_year = 2026</pre></div></div>
 <section id="lab4" class="lab">
   <h2><span class="bullet b-green">4</span> Curate the agent</h2>
   <p class="goal"><strong>Goal:</strong> fix every failure in one pass, putting each piece of logic at the lowest layer that works. <span class="time">12:30 · 15 min</span></p>
-  <p>Work through the four steps in order. In our testing, this set of changes took agents from 1 or 2 out of 10 to 9 or 10 out of 10. The instructions in step 1 do most of the work, so don't skip saving them.</p>
+  <p>Work through the four steps in order. Work through the steps in order, and re-run the benchmark when you're done to see which fixes moved which questions.</p>
   <h4>Which fix repairs which question</h4>
   <table class="toolbox">
     <thead><tr><th>Benchmark question</th><th>Why a bare agent misses it</th><th>Fix</th></tr></thead>
@@ -294,7 +294,7 @@ Round percentages to one decimal place and dollar amounts to two decimal places.
 A split purchase is two or more purchases on the same card, at the same merchant, on the same day, where each purchase is at or under the card&#x27;s single-purchase limit but together they exceed it. Count each card, merchant and day group once.</pre></div></li>
   </ol>
   <ol class="steps" data-group="lab4a2">
-    <li><label><input type="checkbox" data-id="l4a2"> Save the instructions, then close <strong>Configure</strong> and reopen the <strong>Instructions</strong> tab to check the text is still there. This step matters most: in our testing, the same agent scored 5 out of 10 without saved instructions and 10 out of 10 with them.</label></li>
+    <li><label><input type="checkbox" data-id="l4a2"> Save the instructions, then close <strong>Configure</strong> and reopen the <strong>Instructions</strong> tab to check the text is still there.</label></li>
     <li><label><input type="checkbox" data-id="l4a3"> Quick check: in <strong>Chat</strong>, ask the question below. If Genie asks what you mean, the instructions didn't save.</label>
       <p class="q">Who are our big spenders?</p></li>
   </ol>
