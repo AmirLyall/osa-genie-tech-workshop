@@ -255,7 +255,8 @@ WHERE m.is_blocked AND t.fiscal_year = 2026</pre></div></div>
 
   <h3>Step 1: instructions</h3>
   <ol class="steps" data-group="lab4a">
-    <li><label><input type="checkbox" data-id="l4a"> In your agent, click <strong>Configure</strong>, open the <strong>Instructions</strong> tab, and paste these definitions under <strong>General Instructions</strong>:</label>
+    <li><label><input type="checkbox" data-id="l4a"> In your agent, click <strong>Configure</strong> and open the <strong>Instructions</strong> tab. Under <strong>General Instructions</strong>, click <strong>Generate with Genie</strong> (it reads <strong>Improve with Genie</strong> if there's already text). Genie profiles the tables, reads your benchmark questions and existing examples, and drafts instructions from what it finds, including the data's date range and the fiscal calendar.</label></li>
+    <li><label><input type="checkbox" data-id="l4a1"> Review the draft against OSA's definitions below. Genie infers definitions from the data and the benchmarks, so check that each one matches policy, and add any that are missing:</label>
       <div class="codeblock"><pre>The data runs through June 30, 2026. Treat 2026-06-30 as today. &quot;Last quarter&quot; means fiscal year 2026 Q4 (April to June 2026).
 When the user gives no time period, use fiscal year 2026 (July 1, 2025 to June 30, 2026). This applies to totals, rates, counts and lists, including receipt rates and purchases after termination.
 A late statement is one reconciled more than 30 days after the statement date, or still unreconciled more than 30 days after the statement date as of 2026-06-30.
@@ -268,7 +269,6 @@ Round percentages to one decimal place and dollar amounts to two decimal places.
 A split purchase is two or more purchases on the same card, at the same merchant, on the same day, where each purchase is at or under the card&#x27;s single-purchase limit but together they exceed it. Count each card, merchant and day group once.</pre></div></li>
     <li><label><input type="checkbox" data-id="l4a2"> Save, then close <strong>Configure</strong> and reopen the <strong>Instructions</strong> tab to check the text is still there.</label></li>
   </ol>
-  <div class="callout info"><strong>Want Genie to help?</strong> Click <strong>Generate with Genie</strong> first, keep the overview it writes, and paste the definitions below it. Genie can describe the tables, but it can't know OSA's definitions or that the data stops on June 30, 2026.</div>
 
   <h3>Step 2: a metric view of your own</h3>
   <ol class="steps" data-group="lab4c">
@@ -495,7 +495,7 @@ databricks bundle generate genie-space --existing-id {{AGENT_ID}} --key pcard_re
       <li><strong>New agent:</strong> Genie Agents, New.</li>
       <li><strong>Benchmarks:</strong> Benchmark at the top of the agent, then the Questions tab and Run all benchmarks.</li>
       <li><strong>Results:</strong> Benchmark, then the Evaluations tab.</li>
-      <li><strong>Instructions:</strong> Configure, Instructions, then Generate with Genie.</li>
+      <li><strong>Instructions:</strong> Configure, Instructions, then Generate with Genie or Improve with Genie.</li>
       <li><strong>Example queries:</strong> Configure, Examples, Add, then Parameters and Usage Guidance.</li>
       <li><strong>Add a metric view:</strong> Configure, Data, Add.</li>
       <li><strong>Agent-level descriptions and synonyms:</strong> Configure, Sources, pencil on a column.</li>
