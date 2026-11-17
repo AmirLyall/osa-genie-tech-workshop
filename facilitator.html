@@ -21,23 +21,22 @@
   <h2>Facilitator guide</h2>
   <details class="faq" open><summary>Before the session</summary>
   <ol>
-    <li>Confirm the administrator checklist on the <a href="setup.html">setup page</a>, including the schema attendees will use for their metric views.</li>
-    <li>Run the whole flow yourself once: create an agent, load the benchmarks, run a baseline, curate it, re-run, and deploy the bundle. Keep that agent as your demo, so you have finished runs to show if a live run is slow.</li>
-    <li>Check that attendees can run the Databricks CLI (version 1.3.0 or later) against the workspace, from their laptop or the web terminal.</li>
+    <li>Confirm the administrator checklist on the <a href="setup.html">setup page</a>: the metric view schema, a workshop domain for Pages, a Git folder for the bundle, and the web terminal.</li>
+    <li>Run the whole flow yourself once, start to finish, and keep that agent as your demo so you have finished runs to show if a live run is slow.</li>
     <li>Hybrid room: share one browser window at a large zoom, and have a second person watch the meeting chat for errors people hit.</li>
   </ol></details>
   <details class="faq" open><summary>Run of show</summary>
   <table class="agenda">
     <thead><tr><th>Time</th><th>Block</th><th>Show and say</th></tr></thead>
     <tbody>
-      <tr><td class="slot">12:00 (10)</td><td>Kickoff</td><td>Walk the layers pyramid, the poorly worded vs. well worded table, and the flow. Explain how the judge grades: a missing reference column fails, extra columns don't.</td></tr>
-      <tr><td class="slot">12:10 (10)</td><td>Create and seed</td><td>Create the agent live, hold off on Genie Code suggestions, rename it, paste the URL. Load the benchmarks with the notebook, and point anyone stuck to the by-hand tab.</td></tr>
-      <tr><td class="slot">12:20 (10)</td><td>Baseline</td><td>Run all benchmarks and open the run. Read the score reason and judge analysis on "big spenders" (a clarifying question) and "split purchases" (the wrong period).</td></tr>
-      <tr><td class="slot">12:30 (15)</td><td>Curate</td><td>Apply the four steps in order: instructions, three example queries, the metric view, the synonym. Point out which layer each one is in, and why.</td></tr>
-      <tr><td class="slot">12:45 (15)</td><td>Re-run and keep as code</td><td>Re-run and compare. Generate the bundle from your agent, open the JSON, and deploy the production copy. Close with a sentence on Genie Workbench and the production checklist.</td></tr>
+      <tr><td class="slot">12:00 (10)</td><td>Kickoff</td><td>Walk the layers pyramid, the poorly worded vs. well worded table, and the flow. Set the goal: start low, finish above 80%.</td></tr>
+      <tr><td class="slot">12:10 (10)</td><td>Create, seed and benchmark</td><td>Create the agent live, rename it, paste the URL. Load the benchmarks, start the baseline run, and read one judge analysis together while it finishes.</td></tr>
+      <tr><td class="slot">12:20 (15)</td><td>Curate</td><td>Instructions, the metric view, the three example queries, then the glossary: agent synonyms and one draft Page. Name the layer each change sits in, and why.</td></tr>
+      <tr><td class="slot">12:35 (10)</td><td>Re-run and refine</td><td>Re-run and compare. Open a failed question, review the proposed fixes as a group, accept the right ones, and run again.</td></tr>
+      <tr><td class="slot">12:45 (15)</td><td>Keep it as code</td><td>Create the bundle in the Git folder, pull the agent in from the web terminal, deploy prod from the Deployments pane, and open the JSON. Close with a sentence on Genie Workbench and the production checklist.</td></tr>
     </tbody>
   </table></details>
-  <details class="faq"><summary>If something breaks</summary><p>If the notebook can't load benchmarks, switch the room to the by-hand tab and have people add the first five. If a metric view fails, check the schema permission and carry on with the other fixes. If the CLI isn't available, deploy the bundle from your screen.</p></details>
+  <details class="faq"><summary>If something breaks</summary><p>If the notebook can't load benchmarks, switch the room to the by-hand tab and have people add the first five. If a metric view fails, check the schema permission and carry on with the other fixes. If the web terminal or Git folder isn't set up, show the bundle from your screen.</p></details>
 </section>
 <footer><img src="databricks-logo.svg" alt="Databricks"><span><a href="./">Workshop guide</a> · <a href="setup.html">Setup</a> · <a href="facilitator.html">Facilitator guide</a></span></footer>
 </main>
