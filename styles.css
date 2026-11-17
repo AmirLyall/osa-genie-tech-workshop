@@ -350,3 +350,11 @@ h3 .pill { font-size: 11px; font-weight: 600; color: var(--slate); background: v
 .steps .settings-box input { position: static; display: block; width: 100%; height: auto; margin: 0; appearance: auto; -webkit-appearance: none; font: inherit; font-size: .93em; padding: 8px 10px; border: 1px solid var(--line); border-radius: 4px; background: var(--white); }
 .steps .settings-box label { position: static; padding: 0; }
 .settings-box .grid2x2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+/* ---------- rich copy block (pastes with formatting) ---------- */
+.rich-copy { position: relative; background: var(--white); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 70px 14px 18px; margin: 8px 0; max-height: 420px; overflow-y: auto; font-size: .92em; }
+.rich-copy h1 { font-size: 1.3em; margin: 0 0 .4em; }
+.rich-copy h2 { font-size: 1.05em; margin: 1em 0 .3em; font-weight: 600; }
+.rich-copy p { margin: .15em 0; }
+.rich-copy > .copy { position: sticky; float: right; top: 0; margin-right: -58px; }
+.rich-copy { overflow-x: hidden; }

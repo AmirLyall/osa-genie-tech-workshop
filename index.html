@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=3">
+<link rel="stylesheet" href="styles.css?v=5">
 </head>
 <body>
 
@@ -378,98 +378,80 @@ WHERE c.card_status = &#x27;Active&#x27;
       <p class="muted small">Name</p><p class="q"><span data-tpl>P-Card Review Data Dictionary ({{NAME}})</span></p>
       <p class="muted small">Synonyms</p><p class="q">p-card glossary, p-card data dictionary, purchasing card terms</p>
       <p class="muted small">Description</p><p class="q">Business terms used in P-card review, with their synonyms and the tables and columns where each one lives.</p>
-      <p class="muted small">Page body</p>
-      <div class="codeblock"><pre>P-Card Review data dictionary
-
-Fiscal year (FY)
-Definition: The North Carolina state fiscal year, July 1 through June 30, named for the year it ends. For example, FY2026 runs July 1, 2025 through June 30, 2026.
-Synonyms: FY, fiscal year, state fiscal year
-Related data: transactions.fiscal_year, monthly_statements.fiscal_year, agency_budgets.fiscal_year
-
-Fiscal quarter
-Definition: A three-month part of the fiscal year: Q1 is July to September, Q2 October to December, Q3 January to March, Q4 April to June.
-Synonyms: quarter
-Related data: transactions.fiscal_quarter
-
-Agency
-Definition: A state agency that participates in the P-card program.
-Synonyms: department, dept, state agency
-Related data: agencies.agency_code, agencies.agency_name
-
-Cardholder
-Definition: The state employee a purchasing card is issued to. Several cardholders can share a name, so each card is identified by its card ID.
-Synonyms: card owner, employee
-Related data: cardholders.card_id, cardholders.cardholder_name
-
-Single-purchase limit
-Definition: The most a cardholder may spend in one purchase on their card.
-Synonyms: transaction limit, per-purchase limit
-Related data: cardholders.single_purchase_limit
-
-Monthly limit
-Definition: The most a cardholder may spend on their card in a calendar month.
-Synonyms: monthly cap, credit limit
-Related data: cardholders.monthly_limit
-
-Merchant category code (MCC)
-Definition: A four-digit code that classifies the type of business a purchase was made at.
-Synonyms: MCC, merchant category
-Related data: transactions.mcc, merchant_categories.mcc
-
-Blocked merchant category
-Definition: A merchant category that card policy prohibits, such as bars, liquor stores, gambling or cash withdrawals.
-Synonyms: prohibited merchant, not allowed, places we don&#x27;t allow
-Related data: merchant_categories.is_blocked
-
-Split purchase
-Definition: Two or more purchases on the same card, at the same merchant, on the same day, where each is within the card&#x27;s single-purchase limit but together they exceed it. Each card, merchant and day group counts as one split purchase.
-Synonyms: split transaction, purchase splitting, split charge
-Related data: transactions, cardholders.single_purchase_limit
-
-Termination date
-Definition: The date a cardholder left state employment.
-Synonyms: separation date, end date, left
-Related data: cardholders.termination_date, cardholders.employee_status
-
-Purchase after termination
-Definition: A purchase made on a card after its cardholder&#x27;s termination date.
-Synonyms: post-termination spending, spending after they left
-Related data: transactions.transaction_date, cardholders.termination_date
-
-Receipt compliance rate
-Definition: The percentage of purchases with an itemized receipt attached.
-Synonyms: receipt rate, receipt compliance
-Related data: transactions.receipt_attached
-
-Bad receipt compliance
-Definition: A receipt compliance rate below 90% for a fiscal year.
-Synonyms: poor receipt compliance, low receipt rate
-Related data: transactions.receipt_attached
-
-Dormant card
-Definition: An active card with no purchases in the most recent 90 days.
-Synonyms: inactive card, unused card
-Related data: cardholders.card_status, transactions.transaction_date
-
-Statement reconciliation
-Definition: The monthly review in which a cardholder matches their statement to receipts and their approver signs off.
-Synonyms: reconciliation, statement review
-Related data: monthly_statements.reconciled, monthly_statements.reconciled_date, monthly_statements.days_to_reconcile
-
-Late statement
-Definition: A monthly statement reconciled more than 30 days after the statement date, or still unreconciled more than 30 days after it.
-Synonyms: overdue statement, late reconciliation
-Related data: monthly_statements.days_to_reconcile, monthly_statements.statement_date
-
-Big spenders
-Definition: The cardholders with the highest total spend in a period, usually the top 10.
-Synonyms: top spenders, highest spenders
-Related data: transactions.amount, cardholders.card_id
-
-Budget utilization
-Definition: An agency&#x27;s P-card spend for a fiscal year divided by its P-card budget for that year.
-Synonyms: budget used, spend against budget
-Related data: transactions.amount, agency_budgets.pcard_budget</pre></div></li>
+      <p class="muted small">Page body: copy this and paste it into the Page body. The headings and bold labels paste as formatting.</p>
+      <div class="rich-copy"><h1>P-Card Review data dictionary</h1>
+<h2>Fiscal year (FY)</h2>
+<p><strong>Definition:</strong> The North Carolina state fiscal year, July 1 through June 30, named for the year it ends. For example, FY2026 runs July 1, 2025 through June 30, 2026.</p>
+<p><strong>Synonyms:</strong> FY, fiscal year, state fiscal year</p>
+<p><strong>Related data:</strong> <code>transactions.fiscal_year</code>, <code>monthly_statements.fiscal_year</code>, <code>agency_budgets.fiscal_year</code></p>
+<h2>Fiscal quarter</h2>
+<p><strong>Definition:</strong> A three-month part of the fiscal year: Q1 is July to September, Q2 October to December, Q3 January to March, Q4 April to June.</p>
+<p><strong>Synonyms:</strong> quarter</p>
+<p><strong>Related data:</strong> <code>transactions.fiscal_quarter</code></p>
+<h2>Agency</h2>
+<p><strong>Definition:</strong> A state agency that participates in the P-card program.</p>
+<p><strong>Synonyms:</strong> department, dept, state agency</p>
+<p><strong>Related data:</strong> <code>agencies.agency_code</code>, <code>agencies.agency_name</code></p>
+<h2>Cardholder</h2>
+<p><strong>Definition:</strong> The state employee a purchasing card is issued to. Several cardholders can share a name, so each card is identified by its card ID.</p>
+<p><strong>Synonyms:</strong> card owner, employee</p>
+<p><strong>Related data:</strong> <code>cardholders.card_id</code>, <code>cardholders.cardholder_name</code></p>
+<h2>Single-purchase limit</h2>
+<p><strong>Definition:</strong> The most a cardholder may spend in one purchase on their card.</p>
+<p><strong>Synonyms:</strong> transaction limit, per-purchase limit</p>
+<p><strong>Related data:</strong> <code>cardholders.single_purchase_limit</code></p>
+<h2>Monthly limit</h2>
+<p><strong>Definition:</strong> The most a cardholder may spend on their card in a calendar month.</p>
+<p><strong>Synonyms:</strong> monthly cap, credit limit</p>
+<p><strong>Related data:</strong> <code>cardholders.monthly_limit</code></p>
+<h2>Merchant category code (MCC)</h2>
+<p><strong>Definition:</strong> A four-digit code that classifies the type of business a purchase was made at.</p>
+<p><strong>Synonyms:</strong> MCC, merchant category</p>
+<p><strong>Related data:</strong> <code>transactions.mcc</code>, <code>merchant_categories.mcc</code></p>
+<h2>Blocked merchant category</h2>
+<p><strong>Definition:</strong> A merchant category that card policy prohibits, such as bars, liquor stores, gambling or cash withdrawals.</p>
+<p><strong>Synonyms:</strong> prohibited merchant, not allowed, places we don&#x27;t allow</p>
+<p><strong>Related data:</strong> <code>merchant_categories.is_blocked</code></p>
+<h2>Split purchase</h2>
+<p><strong>Definition:</strong> Two or more purchases on the same card, at the same merchant, on the same day, where each is within the card&#x27;s single-purchase limit but together they exceed it. Each card, merchant and day group counts as one split purchase.</p>
+<p><strong>Synonyms:</strong> split transaction, purchase splitting, split charge</p>
+<p><strong>Related data:</strong> <code>transactions</code>, <code>cardholders.single_purchase_limit</code></p>
+<h2>Termination date</h2>
+<p><strong>Definition:</strong> The date a cardholder left state employment.</p>
+<p><strong>Synonyms:</strong> separation date, end date, left</p>
+<p><strong>Related data:</strong> <code>cardholders.termination_date</code>, <code>cardholders.employee_status</code></p>
+<h2>Purchase after termination</h2>
+<p><strong>Definition:</strong> A purchase made on a card after its cardholder&#x27;s termination date.</p>
+<p><strong>Synonyms:</strong> post-termination spending, spending after they left</p>
+<p><strong>Related data:</strong> <code>transactions.transaction_date</code>, <code>cardholders.termination_date</code></p>
+<h2>Receipt compliance rate</h2>
+<p><strong>Definition:</strong> The percentage of purchases with an itemized receipt attached.</p>
+<p><strong>Synonyms:</strong> receipt rate, receipt compliance</p>
+<p><strong>Related data:</strong> <code>transactions.receipt_attached</code></p>
+<h2>Bad receipt compliance</h2>
+<p><strong>Definition:</strong> A receipt compliance rate below 90% for a fiscal year.</p>
+<p><strong>Synonyms:</strong> poor receipt compliance, low receipt rate</p>
+<p><strong>Related data:</strong> <code>transactions.receipt_attached</code></p>
+<h2>Dormant card</h2>
+<p><strong>Definition:</strong> An active card with no purchases in the most recent 90 days.</p>
+<p><strong>Synonyms:</strong> inactive card, unused card</p>
+<p><strong>Related data:</strong> <code>cardholders.card_status</code>, <code>transactions.transaction_date</code></p>
+<h2>Statement reconciliation</h2>
+<p><strong>Definition:</strong> The monthly review in which a cardholder matches their statement to receipts and their approver signs off.</p>
+<p><strong>Synonyms:</strong> reconciliation, statement review</p>
+<p><strong>Related data:</strong> <code>monthly_statements.reconciled</code>, <code>monthly_statements.reconciled_date</code>, <code>monthly_statements.days_to_reconcile</code></p>
+<h2>Late statement</h2>
+<p><strong>Definition:</strong> A monthly statement reconciled more than 30 days after the statement date, or still unreconciled more than 30 days after it.</p>
+<p><strong>Synonyms:</strong> overdue statement, late reconciliation</p>
+<p><strong>Related data:</strong> <code>monthly_statements.days_to_reconcile</code>, <code>monthly_statements.statement_date</code></p>
+<h2>Big spenders</h2>
+<p><strong>Definition:</strong> The cardholders with the highest total spend in a period, usually the top 10.</p>
+<p><strong>Synonyms:</strong> top spenders, highest spenders</p>
+<p><strong>Related data:</strong> <code>transactions.amount</code>, <code>cardholders.card_id</code></p>
+<h2>Budget utilization</h2>
+<p><strong>Definition:</strong> An agency&#x27;s P-card spend for a fiscal year divided by its P-card budget for that year.</p>
+<p><strong>Synonyms:</strong> budget used, spend against budget</p>
+<p><strong>Related data:</strong> <code>transactions.amount</code>, <code>agency_budgets.pcard_budget</code></p></div></li>
     <li><label><input type="checkbox" data-id="l4f3"> Click <strong>Save as draft</strong>. Draft Pages are used only in your own Genie One chats, so everyone can practice without publishing duplicates. In production, one owner publishes a single glossary for the domain.</label></li>
   </ol>
   <div class="callout info"><strong>Another option: synonyms inside the agent.</strong> In <strong>Configure</strong>, open <strong>Sources</strong>, click a table, and click the <strong>pencil icon</strong> on a column to add synonyms, such as "department" on <code>agency_name</code>. They apply only to your agent, so they're a quick fix when one agent needs a term the glossary doesn't cover.</div>
@@ -604,6 +586,6 @@ databricks bundle generate genie-space --existing-id {{AGENT_ID}} --key pcard_re
 </main>
 </div>
 
-<script src="app.js?v=5"></script>
+<script src="app.js?v=6"></script>
 </body>
 </html>
